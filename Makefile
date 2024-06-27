@@ -1,18 +1,23 @@
-fake_readline.so: fake_readline.vala
-	valac fake_readline.vala --pkg=gmodule-2.0 --library=readline -X --shared -o fake_readline.so -X -fpic -X -w
+SRC = main.vala core.vala
+NAME = tester
+NAME_FAKE = fake_readline.so
+SRC_FAKE = fake_readline.vala
 
-tester: fake_readline.so main.vala core.vala
-	valac main.vala core.vala --pkg=gio-2.0 -X -w -X -O3 -o tester
+all: $(NAME) fake_readline.so
 
-debug: fake_readline.so main.vala core.vala
-	valac main.vala core.vala --pkg=gio-2.0 -X -w -X -O3 --debug -X -fsanitize=address -o tester
+$(NAME_FAKE): $(SRC_FAKE) 
+	valac $(SRC_FAKE) --pkg=gmodule-2.0 --library=readline -X --shared -o $(NAME_FAKE) -X -fpic -X -w
 
-all: tester
+$(NAME): ${SRC} 
+	valac ${SRC} --pkg=gio-2.0 -X -w -X -O3 -o $(NAME) 
+
+debug: ${SRC} 
+	valac ${SRC} --pkg=gio-2.0 -X -w -X -O3 --debug -X -fsanitize=address -o $(NAME) 
 
 re: clean all
 
 clean:
-	rm -f *.so *.c tester *.test
+	rm -rf ${NAME} ${NAME_FAKE} trash
 
 run: all
 	./tester
