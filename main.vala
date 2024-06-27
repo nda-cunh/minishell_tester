@@ -1,11 +1,10 @@
 public bool print_only_error = false;
 
-async void main (string []args)
-{
+async void main (string []args) { 
+	DirUtils.create ("trash", 0777);
 	if (args.length > 1) {
-		if ("only-error" in args[1]) {
+		if ("only-error" in args[1])
 			print_only_error = true;
-		}
 	}
 
 	log_hander();
@@ -39,8 +38,8 @@ async void main (string []args)
 	add_test.begin("""echo hi | >""");
 	add_test.begin("""echo hi | > >>""");
 	add_test.begin("""echo hi | < |""");
-	add_test.begin("""echo hi |   |""");
-	add_test.begin("""echo hi |  "|""");
+	add_test.begin("""echo hi |   | """);
+	add_test.begin("""echo hi |  "| """);
 
 	///////////////////////
 	// Test With Exit
@@ -110,7 +109,6 @@ async void main (string []args)
 	add_test.begin(""" printf 'Hello World' | cat -e """);
 	add_test.begin(""" echo "Hello World" | cat -e | cat -e """);
 
-	add_test.begin(""" echo "cat file_ls | cat > file_ls"   """);
 	add_test.begin(""" echo "cat Makefile | cat > $USER"   """);
 	add_test.begin(""" echo 'cat Makefile | cat > $USER'   """);
 	add_test.begin(""" /bin/ls | /usr/bin/cat -e """);
@@ -144,6 +142,7 @@ async void main (string []args)
 	add_test.begin("				");
 	add_test.begin(" cat -e < Makefile < ../.gitignor  ");
 	add_test.begin(" < main.c ");
+	add_test.begin(" < main.c cat");
 	add_test.begin(" < main.c > /dev/stdout");
 	add_test.begin(" pwd");
 	add_test.begin(" echo -n salut");
@@ -158,17 +157,20 @@ async void main (string []args)
 	// Test With Echo / printf
 	/////////////////////////////
 
-	add_test.begin(""" printf 'Syntax Error!' | | ls """);
-	add_test.begin(""" printf 'Syntax Error!' < | ls """);
-	add_test.begin(""" printf 'Syntax Error!'  >> | ls """);
-	add_test.begin(""" printf 'Syntax Error!' | > file_out """);
-	add_test.begin(""" printf 'Syntax Error!' |> file_out """);
-	add_test.begin(""" >x printf 'Syntax Error!' | """);
-	add_test.begin(""" | >x printf 'Syntax Error!' """);
-	add_test.begin(""" >x printf 'Syntax Error!' > """);
-	add_test.begin(""" >x printf 'Syntax Error!' << """);
+	add_test.begin(""" printf 'Syntax Error!' | | ls """, {"cat -e"});
+	add_test.begin(""" printf 'Syntax Error!' < | ls """, {"cat -e"});
+	add_test.begin(""" printf 'Syntax Error!'  >> | ls """, {"cat -e"});
+	add_test.begin(""" printf 'Syntax Error!' | > file_out """, {"cat -e"});
+	add_test.begin(""" printf 'Syntax Error!' |> file_out """, {"cat -e"});
+	add_test.begin(""" >x printf 'Syntax Error!' | """, {"cat -e"});
+	add_test.begin(""" | >x printf 'Syntax Error!' """, {"cat -e"});
+	add_test.begin(""" >x printf 'Syntax Error!' > """, {"cat -e"});
+	add_test.begin(""" >x printf 'Syntax Error!' << """ , {"cat -e"});
 	add_test.begin(""" echo '>' test '<' """);
 	add_test.begin(""" echo '>'""");
+	add_test.begin(""" echo '<'""");
+	add_test.begin(""" echo '<<'""");
+	add_test.begin(""" echo '>>'""");
 	add_test.begin(""" echo '>test<' """);
 	add_test.begin(""" echo '>test' """);
 	add_test.begin(""" echo 'test<' """);
@@ -319,14 +321,14 @@ async void main (string []args)
 	///////////////////////////////////
 
 
-	add_test.begin(" echo 'Hello World' > a.test ", {"cat a.test -e"});
-	add_test.begin(" >b.test echo 'Hello World' > c.test ", {"cat b.test -e", "echo A", "cat c.test -e"});
-	add_test.begin(">d.test >e.test >f.test >g.test echo 'hello' >h.test > i.test > j.test", {"cat d.test -e", "cat e.test -e", "cat f.test -e", "cat g.test -e", "cat h.test -e", "cat i.test -e", "cat j.test -e"});
-	add_test.begin ("echo 'hello world' > /dev/null | cat -e");
-	add_test.begin (">/dev/null echo 'hello world' | cat -e");
-	add_test.begin ("echo 'A' > l.test", {"echo 'B' >> l.test", "echo 'C' >> l.test", "cat l.test -e"});
-	add_test.begin ("echo 'A' > m.test", {" >> m.test echo 'B'", ">> m.test echo 'C'", "cat m.test -e"});
+	add_test.begin(" echo 'Hello World' >trash/a.test ", {"cat a.test -e"});
+	add_test.begin(" >trash/b.test echo 'Hello World' >trash/c.test ", {"cat b.test -e", "echo A", "cat c.test -e"});
+	add_test.begin(">trash/d.test >trash/e.test >trash/f.test >trash/g.test echo 'hello' >trash/h.test >trash/i.test >trash/j.test", {"cat d.test -e", "cat e.test -e", "cat f.test -e", "cat g.test -e", "cat h.test -e", "cat i.test -e", "cat j.test -e"});
+	add_test.begin ("echo 'A' >trash/l.test", {"echo 'B' >trash/>trash/l.test", "echo 'C' >trash/>trash/l.test", "cat l.test -e"});
+	add_test.begin ("echo 'A' >trash/m.test", {" >trash/>trash/m.test echo 'B'", ">trash/>trash/m.test echo 'C'", "cat m.test -e"});
 
+	add_test.begin ("echo 'hello world' >/dev/null | cat -e");
+	add_test.begin (">/dev/null echo 'hello world' | cat -e");
 	add_test.begin (" > /dev/stdout");
 	add_test.begin (" >> /dev/stdout");
 	add_test.begin (" < /dev/stdout");
@@ -362,6 +364,7 @@ async void main (string []args)
 	}
 	print ("\n\033[35m[Total]: %d / %d\033[0m\n", res, Nb_max_test);
 }
+
 
 ////////////////////////////////////////////////////////////////////////////
 // Core of the tester
