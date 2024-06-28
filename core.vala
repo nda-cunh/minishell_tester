@@ -3,7 +3,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 errordomain TestError {
-	ERROR_SEGFAULT
+	SIGNALED
 }
 
 struct ShellInfo {
@@ -41,7 +41,8 @@ async ShellInfo run_minishell (string cmd, string []?av) throws Error {
 	Source.remove (uid);
 	
 	if (subprocess.get_if_signaled ()) {
-		throw new TestError.ERROR_SEGFAULT("SegFault");
+		var sig = subprocess.get_term_sig ();
+		throw new TestError.SIGNALED(strsignal(sig));
 	}
 	result.status = subprocess.get_exit_status ();
 
@@ -161,7 +162,7 @@ async int test (string command, string []?av = null) throws Error {
 		return 1;
 	}
 	catch (Error e) {
-		if (e is IOError.CANCELLED || e is TestError.ERROR_SEGFAULT) {
+		if (e is IOError.CANCELLED || e is TestError.SIGNALED) {
 			print ("\033[36;1mTest\033[0m [%s]", command);
 			print ("\033[31;1m[KO]\033[0m\n");
 		}
@@ -170,7 +171,7 @@ async int test (string command, string []?av = null) throws Error {
 			print("\033[31;1m[Timeout] %s\n\033[0m", e.message);
 			return 0;
 		}
-		if (e is TestError.ERROR_SEGFAULT) {
+		if (e is TestError.SIGNALED) {
 			print("\033[31;1m[SEGFAULT] %s\n\033[0m", e.message);
 			return 0;
 		}
