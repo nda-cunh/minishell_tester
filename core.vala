@@ -2,6 +2,9 @@
 // Code of the tester
 ////////////////////////////////////////////////////////////////////////////
 
+errordomain TestError {
+	ERROR_SEGFAULT
+}
 
 struct ShellInfo {
 	string output;
@@ -36,11 +39,15 @@ async ShellInfo run_minishell (string cmd, string []?av) throws Error {
 	}
 	yield subprocess.wait_async (timeout);
 	Source.remove (uid);
+	
+	if (subprocess.get_if_signaled ()) {
+		throw new TestError.ERROR_SEGFAULT("SegFault");
+	}
 	result.status = subprocess.get_exit_status ();
+
 
 	return result;
 }
-
 
 /**
  * Run Bash with a command and return the output and the status
@@ -154,10 +161,17 @@ async int test (string command, string []?av = null) throws Error {
 		return 1;
 	}
 	catch (Error e) {
-		if (e is IOError.CANCELLED) {
+		if (e is IOError.CANCELLED || e is TestError.ERROR_SEGFAULT) {
 			print ("\033[36;1mTest\033[0m [%s]", command);
 			print ("\033[31;1m[KO]\033[0m\n");
+		}
+
+		if (e is IOError.CANCELLED) {
 			print("\033[31;1m[Timeout] %s\n\033[0m", e.message);
+			return 0;
+		}
+		if (e is TestError.ERROR_SEGFAULT) {
+			print("\033[31;1m[SEGFAULT] %s\n\033[0m", e.message);
 			return 0;
 		}
 		throw e;
