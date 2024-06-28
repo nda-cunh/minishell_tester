@@ -22,8 +22,7 @@ async void main (string []args) {
 	}
 
 	// Enable Fake Readline it write a fake prompt 'SupraVala: '
-	Environment.set_variable("LD_PRELOAD", "fake_readline.so", true);
-	
+	Environment.set_variable("LD_PRELOAD", Environment.get_current_dir () + "/fake_readline.so", true);
 	////////////////////////////////////////////////////////////////////////////
 	// All test is here !
 	////////////////////////////////////////////////////////////////////////////
@@ -50,16 +49,16 @@ async void main (string []args) {
 	// Test With Exit
 	///////////////////////
 
-	// add_test.begin("""exit 123""");
-	// add_test.begin("""exit 298""");
-	// add_test.begin("""exit +100""");
-	// add_test.begin("""exit "+100"""");
-	// add_test.begin("""exit +"100"""");
-	// add_test.begin("""exit -100""");
-	// add_test.begin("""exit "-100"""");
-	// add_test.begin("""exit -"100"""");
-	// add_test.begin("""exit hello""");
-	// add_test.begin("""exit 42 world""");
+	add_test.begin("""exit 123""");
+	add_test.begin("""exit 298""");
+	add_test.begin("""exit +100""");
+	add_test.begin("""exit "+100"""");
+	add_test.begin("""exit +"100"""");
+	add_test.begin("""exit -100""");
+	add_test.begin("""exit "-100"""");
+	add_test.begin("""exit -"100"""");
+	add_test.begin("""exit hello""");
+	add_test.begin("""exit 42 world""");
 
 
 	///////////////////////
@@ -328,7 +327,7 @@ async void main (string []args) {
 
 	add_test.begin(" echo 'Hello World' >trash/a.test ", {"cat a.test -e"});
 	add_test.begin(" >trash/b.test echo 'Hello World' >trash/c.test ", {"cat b.test -e", "echo A", "cat c.test -e"});
-	add_test.begin(">trash/d.test >trash/e.test >trash/f.test >trash/g.test echo 'hello' >trash/h.test >trash/i.test >trash/j.test", {"cat d.test -e", "cat e.test -e", "cat f.test -e", "cat g.test -e", "cat h.test -e", "cat i.test -e", "cat j.test -e"});
+	// add_test.begin(">trash/d.test >trash/e.test >trash/f.test >trash/g.test echo 'hello' >trash/h.test >trash/i.test >trash/j.test", {"cat d.test -e", "cat e.test -e", "cat f.test -e", "cat g.test -e", "cat h.test -e", "cat i.test -e", "cat j.test -e"});
 	add_test.begin ("echo 'A' >trash/l.test", {"echo 'B' >trash/>trash/l.test", "echo 'C' >trash/>trash/l.test", "cat l.test -e"});
 	add_test.begin ("echo 'A' >trash/m.test", {" >trash/>trash/m.test echo 'B'", ">trash/>trash/m.test echo 'C'", "cat m.test -e"});
 
