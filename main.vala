@@ -5,11 +5,7 @@ public bool print_leak = false;
 public string minishell_emp;
 
 
-async void all_test(string []args) { 
-
-
-	// Enable Fake Readline it write a fake prompt 'SupraVala: '
-	Environment.set_variable("LD_PRELOAD", Environment.get_current_dir () + "/fake_readline.so", true);
+async void all_test(string []args) {
 	////////////////////////////////////////////////////////////////////////////
 	// All test is here !
 	////////////////////////////////////////////////////////////////////////////
@@ -18,7 +14,7 @@ async void all_test(string []args) {
 	add_test.begin("""| echo oi""");
 	add_test.begin("""| |""");
 	add_test.begin("""| $""");
-	add_test.begin("""| >""");
+	add_test.begin("""| >""", {"test -f '|'"});
 	add_test.begin(""">""");
 	add_test.begin(""">>""");
 	add_test.begin(""">>>""");
@@ -51,7 +47,7 @@ async void all_test(string []args) {
 	///////////////////////
 	// Test With Env
 	///////////////////////
-	
+
 	add_test.begin("""export hello""");
 	add_test.begin("""export HELLO=123""");
 	add_test.begin("""export A-""");
@@ -72,13 +68,6 @@ async void all_test(string []args) {
 	add_test.begin("""unset PATH""", {"/bin/ls"});
 	add_test.begin("""unset PATH""", {"ls"});
 	add_test.begin("""export A='suprapack'""", {"echo a $A", "unset A", "echo a $A"});
-
-
-
-
-
-
-
 
 
 	/////////////////////////////
@@ -251,7 +240,7 @@ async void all_test(string []args) {
 	add_test.begin(""" echo $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ | wc -l""");
 
 	/////////////////////////////
-	// Test With Quotes 
+	// Test With Quotes
 	/////////////////////////////
 
 	add_test.begin(""" printf "$USER$USER'' = ' $L ANG '" """);
@@ -314,7 +303,6 @@ async void all_test(string []args) {
 
 	add_test.begin(" echo 'Hello World' >trash/a.test ", {"cat a.test -e"});
 	add_test.begin(" >trash/b.test echo 'Hello World' >trash/c.test ", {"cat b.test -e", "echo A", "cat c.test -e"});
-	// add_test.begin(">trash/d.test >trash/e.test >trash/f.test >trash/g.test echo 'hello' >trash/h.test >trash/i.test >trash/j.test", {"cat d.test -e", "cat e.test -e", "cat f.test -e", "cat g.test -e", "cat h.test -e", "cat i.test -e", "cat j.test -e"});
 	add_test.begin ("echo 'A' >trash/l.test", {"echo 'B' >trash/>trash/l.test", "echo 'C' >trash/>trash/l.test", "cat l.test -e"});
 	add_test.begin ("echo 'A' >trash/m.test", {" >trash/>trash/m.test echo 'B'", ">trash/>trash/m.test echo 'C'", "cat m.test -e"});
 
@@ -388,22 +376,29 @@ async void loading() {
 }
 
 ////////////////////////////////////////////////////////////////////////////
-// Main  -- options part and start the test 
+// Main  -- options part and start the test
 ////////////////////////////////////////////////////////////////////////////
 class Main {
 	public static async void main (string[] args) {
 		try {
 			minishell_emp = "../minishell";
+
 			// Enable UTF8 for the terminal
 			Intl.setlocale();
 			log_hander();
+
+			// Enable Fake Readline it write a fake prompt 'SupraVala: '
+			Environment.set_variable("LD_PRELOAD", Environment.get_current_dir () + "/fake_readline.so", true);
+
 			// Create the trash directory
 			DirUtils.create ("trash", 0777);
+
 			// Options Part
 			var opt_context = new OptionContext ("- Minishell Tester -");
 			opt_context.set_help_enabled (true);
 			opt_context.add_main_entries (options, null);
 			opt_context.parse (ref args);
+
 			// Check if the minishell is compiled
 			if (FileUtils.test (minishell_emp, FileTest.EXISTS) == false) {
 				warning ("Please compile the minishell before running the test !");
@@ -416,7 +411,7 @@ class Main {
 			printerr(e.message);
 		}
 	}
-	
+
 	const GLib.OptionEntry[] options = {
 		{ "only-error", 'e', OptionFlags.NONE, OptionArg.NONE, ref print_only_error, "Display Error and do not print [OK] test", null },
 		{ "only-output", 'o', OptionFlags.NONE, OptionArg.NONE, ref print_only_output, "Display only error-output", null },
@@ -426,4 +421,3 @@ class Main {
 		{ null }
 	};
 }
-
