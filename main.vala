@@ -1,13 +1,18 @@
 public bool print_only_error = false;
 
 async void main (string []args) { 
+	// Create the trash directory
 	DirUtils.create ("trash", 0777);
+	// Enable UTF8 for the terminal
+	Intl.setlocale();
+	log_hander();
+
+	// Argument to print only error
 	if (args.length > 1) {
 		if ("only-error" in args[1])
 			print_only_error = true;
 	}
 
-	log_hander();
 
 	// Check if the minishell is compiled
 	if (FileUtils.test ("../minishell", FileTest.EXISTS) == false) {
@@ -18,6 +23,9 @@ async void main (string []args) {
 
 	// Enable Fake Readline it write a fake prompt 'SupraVala: '
 	Environment.set_variable("LD_PRELOAD", "fake_readline.so", true);
+	
+	yield add_test(""" /bin/ls """);
+	yield add_test(""" /bin/ls -l""");
 
 	////////////////////////////////////////////////////////////////////////////
 	// All test is here !
@@ -355,6 +363,7 @@ async void main (string []args) {
 
 	add_test.begin("edsfdsf" , {"echo error: $?"});
 
+	loading.begin();
 	while (Max_async_test != 0) {
 		Idle.add(()=>{
 			Idle.add(main.callback);
@@ -365,6 +374,35 @@ async void main (string []args) {
 	print ("\n\033[35m[Total]: %d / %d\033[0m\n", res, Nb_max_test);
 }
 
+/*
+ * loading animation
+ */
+async void loading() {
+	const string animation[] = {
+		"⠋ Loading .  ",
+		"⠙ Loading .. ",
+		"⠹ Loading ...",
+		"⠸ Loading .. ",
+		"⠼ Loading ...",
+		"⠴ Loading .. ",
+		"⠦ Loading .  ",
+		"⠧ Loading .. ",
+		"⠇ Loading .  ",
+		"⠏ Loading .. "
+	};
+	int i = 0;
+	while (true) {
+		Timeout.add (300, ()=>{
+			Idle.add(loading.callback);
+			return false;
+		});
+		yield;
+		print("%s\r", animation[i]);
+		++i;
+		if (i == animation.length)
+			i = 0;
+	}
+}
 
 ////////////////////////////////////////////////////////////////////////////
 // Core of the tester
