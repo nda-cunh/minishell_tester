@@ -24,9 +24,6 @@ async void main (string []args) {
 	// Enable Fake Readline it write a fake prompt 'SupraVala: '
 	Environment.set_variable("LD_PRELOAD", "fake_readline.so", true);
 	
-	yield add_test(""" /bin/ls """);
-	yield add_test(""" /bin/ls -l""");
-
 	////////////////////////////////////////////////////////////////////////////
 	// All test is here !
 	////////////////////////////////////////////////////////////////////////////

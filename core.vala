@@ -17,6 +17,11 @@ async ShellInfo run_minishell (string cmd, string []?av) throws Error {
 	ShellInfo result = {};
 
 	var subprocess = new Subprocess.newv        ({"../minishell"}, STDIN_PIPE | STDOUT_PIPE | SubprocessFlags.STDERR_SILENCE);
+	var uid = Timeout.add (4000, ()=> {
+		timeout.cancel();
+		subprocess.force_exit ();
+		return false;
+	});
 
 	if (av == null)
 		yield subprocess.communicate_utf8_async (cmd + "\n", timeout, out result.output, out result.errput);
@@ -30,6 +35,7 @@ async ShellInfo run_minishell (string cmd, string []?av) throws Error {
 		yield subprocess.communicate_utf8_async (arguments.str, timeout, out result.output, out result.errput);
 	}
 	yield subprocess.wait_async (timeout);
+	Source.remove (uid);
 	result.status = subprocess.get_exit_status ();
 
 	return result;
@@ -149,7 +155,9 @@ async int test (string command, string []?av = null) throws Error {
 	}
 	catch (Error e) {
 		if (e is IOError.CANCELLED) {
-			print("[Timeout] %s\n", e.message);
+			print ("\033[36;1mTest\033[0m [%s]", command);
+			print ("\033[31;1m[KO]\033[0m\n");
+			print("\033[31;1m[Timeout] %s\n\033[0m", e.message);
 			return 0;
 		}
 		throw e;
