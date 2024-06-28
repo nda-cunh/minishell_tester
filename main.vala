@@ -1,25 +1,12 @@
 public bool print_only_error = false;
-
-async void main (string []args) { 
-	// Create the trash directory
-	DirUtils.create ("trash", 0777);
-	// Enable UTF8 for the terminal
-	Intl.setlocale();
-	log_hander();
-
-	// Argument to print only error
-	if (args.length > 1) {
-		if ("only-error" in args[1])
-			print_only_error = true;
-	}
+public bool print_only_output = false;
+public bool print_only_status = false;
+public bool print_leak = false;
+public string minishell_emp;
 
 
-	// Check if the minishell is compiled
-	if (FileUtils.test ("../minishell", FileTest.EXISTS) == false) {
-		warning ("Please compile the minishell before running the test !");
-		warning ("'../minishell' is not found !");
-		return ;
-	}
+async void all_test(string []args) { 
+
 
 	// Enable Fake Readline it write a fake prompt 'SupraVala: '
 	Environment.set_variable("LD_PRELOAD", Environment.get_current_dir () + "/fake_readline.so", true);
@@ -362,7 +349,7 @@ async void main (string []args) {
 	loading.begin();
 	while (Max_async_test != 0) {
 		Idle.add(()=>{
-			Idle.add(main.callback);
+			Idle.add(all_test.callback);
 			return false;
 		}, Priority.LOW);
 		yield;
@@ -401,30 +388,42 @@ async void loading() {
 }
 
 ////////////////////////////////////////////////////////////////////////////
-// Core of the tester
+// Main  -- options part and start the test 
 ////////////////////////////////////////////////////////////////////////////
-
-public int Nb_max_test = 0;
-public int Max_async_test = 0;
-public int Max_process = 0;
-public int res = 0;
-
-async void add_test(string command, string []?av = null) {
-	string[] avx = av.copy();
-
-	++Nb_max_test;
-	++Max_async_test;
-	while (Max_process >= get_num_processors ()) {
-		Idle.add(add_test.callback);
-		yield;
+class Main {
+	public static async void main (string[] args) {
+		try {
+			minishell_emp = "../minishell";
+			// Enable UTF8 for the terminal
+			Intl.setlocale();
+			log_hander();
+			// Create the trash directory
+			DirUtils.create ("trash", 0777);
+			// Options Part
+			var opt_context = new OptionContext ("- Minishell Tester -");
+			opt_context.set_help_enabled (true);
+			opt_context.add_main_entries (options, null);
+			opt_context.parse (ref args);
+			// Check if the minishell is compiled
+			if (FileUtils.test (minishell_emp, FileTest.EXISTS) == false) {
+				warning ("Please compile the minishell before running the test !");
+				warning (@"'$minishell_emp' is not found !");
+				return ;
+			}
+			yield all_test(args);
+		}
+		catch (Error e) {
+			printerr(e.message);
+		}
 	}
-	++Max_process;
-	try {
-		res += yield test(command, avx);
-	}
-	catch (Error e) {
-	warning(e.message);
-	}
-	--Max_async_test;
-	--Max_process;
+	
+	const GLib.OptionEntry[] options = {
+		{ "only-error", 'e', OptionFlags.NONE, OptionArg.NONE, ref print_only_error, "Display Error and do not print [OK] test", null },
+		{ "only-output", 'o', OptionFlags.NONE, OptionArg.NONE, ref print_only_output, "Display only error-output", null },
+		{ "only-status", 's', OptionFlags.NONE, OptionArg.NONE, ref print_only_status, "Display only error-status", null },
+		{ "minishell", 'm', OptionFlags.NONE, OptionArg.STRING, ref minishell_emp, "the path of minishell default: '../minishell'", "Minishell Path"},
+		{ "leak", 'v', OptionFlags.NONE, OptionArg.NONE, ref print_leak, "Add Leak test (is too slow)", null },
+		{ null }
+	};
 }
+

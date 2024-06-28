@@ -12,6 +12,31 @@ struct ShellInfo {
 	int status;
 }
 
+public int Nb_max_test = 0;
+public int Max_async_test = 0;
+public int Max_process = 0;
+public int res = 0;
+
+async void add_test(string command, string []?av = null) {
+	string[] avx = av.copy();
+
+	++Nb_max_test;
+	++Max_async_test;
+	while (Max_process >= get_num_processors ()) {
+		Idle.add(add_test.callback);
+		yield;
+	}
+	++Max_process;
+	try {
+		res += yield test(command, avx);
+	}
+	catch (Error e) {
+	warning(e.message);
+	}
+	--Max_async_test;
+	--Max_process;
+}
+
 /**
  * Run Minishell with a command and return the output and the status
  */
@@ -19,7 +44,7 @@ async ShellInfo run_minishell (string cmd, string []?av) throws Error {
 	Cancellable timeout = new Cancellable();
 	ShellInfo result = {};
 
-	var subprocess = new Subprocess.newv        ({"../minishell"}, STDIN_PIPE | STDOUT_PIPE | SubprocessFlags.STDERR_SILENCE);
+	var subprocess = new Subprocess.newv        ({minishell_emp}, STDIN_PIPE | STDOUT_PIPE | SubprocessFlags.STDERR_SILENCE);
 	var uid = Timeout.add (4000, ()=> {
 		timeout.cancel();
 		subprocess.force_exit ();
