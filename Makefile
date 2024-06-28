@@ -6,7 +6,7 @@ SRC_FAKE = fake_readline.vala
 all: $(NAME) fake_readline.so
 
 $(NAME_FAKE): $(SRC_FAKE) 
-	valac $(SRC_FAKE) --pkg=gmodule-2.0 --library=readline -X --shared -o $(NAME_FAKE) -X -fpic -X -w
+	valac $(SRC_FAKE) -X -O2 --pkg=gmodule-2.0 --library=readline -X --shared -o $(NAME_FAKE) -X -fpic -X -w
 
 $(NAME): ${SRC} 
 	valac ${SRC} --pkg=gio-2.0 -X -w -X -O3 -o $(NAME) 
@@ -20,6 +20,6 @@ clean:
 	rm -rf ${NAME} ${NAME_FAKE} trash
 
 run: all
-	./tester
+	time ./tester
 
 .PHONY: all re clean run debug
