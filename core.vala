@@ -91,8 +91,9 @@ async int test (string command, string []?av = null) throws Error {
 					output = output.offset(output.index_of_char ('\n') + 1);
 					minishell_output += output[0: output.index_of("SupraVala: ")];
 					end = output.offset(output.index_of("SupraVala: "));
-					if (end.has_prefix("SupraVala: exit"))
+					if (end.index_of("SupraVala: ", 1) == -1) {
 						break;
+					}
 				}
 			}
 			Idle.add(test.callback);
