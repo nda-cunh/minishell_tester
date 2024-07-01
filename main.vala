@@ -406,6 +406,12 @@ class Main {
 				warning (@"'$minishell_emp' is not found !");
 				return ;
 			}
+
+			// Check if the minishell is an executable
+			if (FileUtils.test (minishell_emp, FileTest.IS_EXECUTABLE) == false) {
+				warning ("The minishell is not an executable !");
+				return ;
+			}
 			yield all_test(args);
 		}
 		catch (Error e) {
@@ -417,7 +423,7 @@ class Main {
 		{ "only-error", 'e', OptionFlags.NONE, OptionArg.NONE, ref print_only_error, "Display Error and do not print [OK] test", null },
 		{ "only-output", 'o', OptionFlags.NONE, OptionArg.NONE, ref print_only_output, "Display only error-output", null },
 		{ "only-status", 's', OptionFlags.NONE, OptionArg.NONE, ref print_only_status, "Display only error-status", null },
-		{ "minishell", 'm', OptionFlags.FILENAME , OptionArg.STRING, ref minishell_emp, "the path of minishell default: '../minishell'", "Minishell Path"},
+		{ "minishell", 'm', OptionFlags.NONE, OptionArg.FILENAME, ref minishell_emp, "the path of minishell default: '../minishell'", "Minishell Path"},
 		{ "leak", 'v', OptionFlags.NONE, OptionArg.NONE, ref print_leak, "Add Leak test (is too slow)", null },
 		{ null }
 	};
