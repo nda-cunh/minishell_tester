@@ -43,16 +43,21 @@ async void add_test(string command, string []?av = null) {
 async ShellInfo run_minishell (string cmd, string []?av) throws Error {
 	Cancellable timeout = new Cancellable();
 	ShellInfo result = {};
+	Subprocess process;
 
-	var subprocess = new Subprocess.newv        ({minishell_emp}, STDIN_PIPE | STDOUT_PIPE | SubprocessFlags.STDERR_SILENCE);
+	if (print_leak)
+		process = new Subprocess.newv ({"valgrind", "--leak-check=full", minishell_emp}, STDIN_PIPE | STDERR_PIPE | STDOUT_PIPE);
+	else
+		process = new Subprocess.newv ({minishell_emp}, STDIN_PIPE | STDOUT_PIPE);
+
 	var uid = Timeout.add (4000, ()=> {
 		timeout.cancel();
-		subprocess.force_exit ();
+		process.force_exit ();
 		return false;
 	});
 
 	if (av == null)
-		yield subprocess.communicate_utf8_async (cmd + "\n", timeout, out result.output, out result.errput);
+		yield process.communicate_utf8_async (cmd + "\n", timeout, out result.output, out result.errput);
 	else {
 		var arguments = new StringBuilder(cmd);
 		arguments.append_c ('\n');
@@ -60,16 +65,16 @@ async ShellInfo run_minishell (string cmd, string []?av) throws Error {
 			arguments.append(arg);
 			arguments.append_c ('\n');
 		}
-		yield subprocess.communicate_utf8_async (arguments.str, timeout, out result.output, out result.errput);
+		yield process.communicate_utf8_async (arguments.str, timeout, out result.output, out result.errput);
 	}
-	yield subprocess.wait_async (timeout);
+	yield process.wait_async (timeout);
 	Source.remove (uid);
 	
-	if (subprocess.get_if_signaled ()) {
-		var sig = subprocess.get_term_sig ();
+	if (process.get_if_signaled ()) {
+		var sig = process.get_term_sig ();
 		throw new TestError.SIGNALED(strsignal(sig));
 	}
-	result.status = subprocess.get_exit_status ();
+	result.status = process.get_exit_status ();
 
 
 	return result;
@@ -105,6 +110,37 @@ async ShellInfo run_bash (string cmd, string []?av) {
 	return result;
 }
 
+
+static bool is_okay (ShellInfo minishell, ShellInfo bash) {
+	bool ret = true;
+	if (minishell.output != bash.output || minishell.status != bash.status) {
+		ret = false;
+	}
+	if (print_leak) {
+		int malloc = 0;
+		unowned string tmp = minishell.errput;
+		int index = 0;
+
+		do {
+			Thread.usleep (100000);
+			index = tmp.index_of("definitely lost: ", 4);
+			if (index != -1) {
+				int m;
+				tmp = tmp.offset(index);
+				tmp.scanf ("definitely lost: %d bytes", out m); 
+				malloc += m;
+			}
+		} while (index != -1);
+
+		if (malloc != 0) {
+			printerr("\033[91mMemory leak: %d bytes\033[0m\n", malloc);
+			ret = false;
+		}
+	}
+	return ret;
+}
+
+
 /**
  * Run Bash and Minishell test (command) and compare it and print the result !
  */
@@ -137,8 +173,10 @@ async int test (string command, string []?av = null) throws Error {
 			}
 			Idle.add(test.callback);
 		});
-		thread.join ();
 		yield;
+		thread.join ();
+
+		minishell.output = (owned)minishell_output;
 
 
 		//////////////////////////
@@ -158,7 +196,7 @@ async int test (string command, string []?av = null) throws Error {
 				print (" [%s]", arg);
 			}
 		}
-		if (minishell_output == bash.output && minishell.status == bash.status) {
+		if (is_okay (minishell, bash)) {
 			if (print_only_error == false)
 				print ("\033[32;1m[OK]\033[0m");
 		}
@@ -175,9 +213,9 @@ async int test (string command, string []?av = null) throws Error {
 				printerr("  Minishell: [%d]\n", minishell.status);
 				printerr("  Bash: [%d]\n\n", bash.status);
 			}
-			if (minishell_output != bash.output) {
+			if (minishell.output != bash.output) {
 				printerr("\033[91mOutput mismatch:\033[0m\n");
-				printerr("  Minishell: [%s]\n", minishell_output);
+				printerr("  Minishell: [%s]\n", minishell.output);
 				printerr("  Bash: [%s]\n\n", bash.output);
 			}
 			return 0;
@@ -203,6 +241,10 @@ async int test (string command, string []?av = null) throws Error {
 		throw e;
 	}
 }
+
+////////////////////////////////////////////////////////////////////////////
+///	Log handler (Function to print the log like warning, error, etc...)
+////////////////////////////////////////////////////////////////////////////
 
 public void log_hander () {
 	Log.set_default_handler((type, level, message)=> {
