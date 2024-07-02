@@ -328,15 +328,14 @@ async void all_test(string []args) {
 	add_test.begin({"""$"""});
 	add_test.begin({"""$?"""});
 	add_test.begin({"""README.md"""});
-
 	add_test.begin({"edsfdsf" , "echo error: $?"});
 
+
+	// run the loading animation
 	loading.begin();
+	// Wait for all test to finish
 	while (Max_async_test != 0) {
-		Idle.add(()=>{
-			Idle.add(all_test.callback);
-			return false;
-		}, Priority.LOW);
+		Idle.add(all_test.callback);
 		yield;
 	}
 	print ("\n\033[35m[Total]: %d / %d\033[0m\n", res, Nb_max_test);
@@ -360,10 +359,7 @@ async void loading() {
 	};
 	int i = 0;
 	while (true) {
-		Timeout.add (300, ()=>{
-			Idle.add(loading.callback);
-			return false;
-		});
+		Timeout.add(300, loading.callback);
 		yield;
 		print("%s\r", animation[i]);
 		++i;
