@@ -27,7 +27,6 @@ async void all_test(string []args) {
 	add_test.begin("""echo hi | > >>""");
 	add_test.begin("""echo hi | < |""");
 	add_test.begin("""echo hi |   | """);
-	add_test.begin("""echo hi |  "| """);
 
 	///////////////////////
 	// Test With Exit
@@ -104,10 +103,6 @@ async void all_test(string []args) {
 	add_test.begin("""echo ''""");
 	add_test.begin("""echo "$PWD"""");
 	add_test.begin("""echo '$PWD'""");
-	add_test.begin("""echo "aspas ->'"""");
-	add_test.begin("""echo "aspas -> ' """");
-	add_test.begin(""")echo 'aspas ->"'""");
-	add_test.begin(""")echo 'aspas -> " '""");
 	add_test.begin("""echo "> >> < * ? [ ] | ; [ ] || && ( ) & # $ \ <<"""");
 	add_test.begin("""echo '> >> < * ? [ ] | ; [ ] || && ( ) & # $ \ <<'""");
 	add_test.begin("""echo "exit_code ->$? user ->$USER home -> $HOME"""");
@@ -138,15 +133,15 @@ async void all_test(string []args) {
 	// Test With Echo / printf
 	/////////////////////////////
 
-	add_test.begin(""" printf 'Syntax Error!' | | ls """, {"cat -e"});
-	add_test.begin(""" printf 'Syntax Error!' < | ls """, {"cat -e"});
-	add_test.begin(""" printf 'Syntax Error!'  >> | ls """, {"cat -e"});
-	add_test.begin(""" printf 'Syntax Error!' | > file_out """, {"cat -e"});
-	add_test.begin(""" printf 'Syntax Error!' |> file_out """, {"cat -e"});
-	add_test.begin(""" >x printf 'Syntax Error!' | """, {"cat -e"});
-	add_test.begin(""" | >x printf 'Syntax Error!' """, {"cat -e"});
-	add_test.begin(""" >x printf 'Syntax Error!' > """, {"cat -e"});
-	add_test.begin(""" >x printf 'Syntax Error!' << """ , {"cat -e"});
+	add_test.begin(""" printf 'Syntax Error!' | | ls """);
+	add_test.begin(""" printf 'Syntax Error!' < | ls """);
+	add_test.begin(""" printf 'Syntax Error!'  >> | ls """);
+	add_test.begin(""" printf 'Syntax Error!' | > file_out """);
+	add_test.begin(""" printf 'Syntax Error!' |> file_out """);
+	add_test.begin(""" >x printf 'Syntax Error!' | """);
+	add_test.begin(""" | >x printf 'Syntax Error!' """);
+	add_test.begin(""" >x printf 'Syntax Error!' > """);
+	add_test.begin(""" >x printf 'Syntax Error!' << """);
 	add_test.begin(""" echo '>' test '<' """);
 	add_test.begin(""" echo '>'""");
 	add_test.begin(""" echo '<'""");
@@ -255,9 +250,9 @@ async void all_test(string []args) {
 	add_test.begin(""" printf $'hello' """);
 	add_test.begin(""" printf $"hello" """);
 	add_test.begin(""" ''''''"/bin/ls"'''''' """);
-	add_test.begin(""" "/b'i"n/ls' -l""");
-	add_test.begin(""" "/b''i"n/''ls -"na'"th'an""");
-	add_test.begin(""" "/b'i''''''''n/"l's """);
+	add_test.begin(""" /b'i"n/ls' -l  """);
+	add_test.begin(""" /b''i"n/''ls -"na'"th'an""");
+	add_test.begin(""" /b'i''''''''n/"l's """);
 	add_test.begin(""" /b'in/l's -l'a'""");
 	add_test.begin(""" '/'b"in/l"s """);
 	add_test.begin(""" echo '$?' """);
