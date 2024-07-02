@@ -9,7 +9,7 @@ $(NAME_FAKE): $(SRC_FAKE)
 	valac $(SRC_FAKE) -X -O2 --pkg=gmodule-2.0 --library=readline -X --shared -o $(NAME_FAKE) -X -fpic -X -w
 
 $(NAME): ${SRC} 
-	valac ${SRC} --pkg=gio-2.0 -X -w -X -O3 -o $(NAME) 
+	valac ${SRC} --pkg=posix --pkg=gio-2.0 -X -w -X -O3 -o $(NAME) 
 
 debug: ${SRC} 
 	valac ${SRC} --pkg=gio-2.0 -X -w -X -O3 --debug -X -fsanitize=address -o $(NAME) 

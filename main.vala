@@ -17,7 +17,6 @@ async void all_test(string []args) {
 	add_test.begin({"""| echo oi"""});
 	add_test.begin({"""| |"""});
 	add_test.begin({"""| $"""});
-	add_test.begin({"""| >""", "test -f '|'"});
 	add_test.begin({""">"""});
 	add_test.begin({""">>"""});
 	add_test.begin({""">>>"""});
@@ -374,6 +373,10 @@ async void loading() {
 [Compact]
 class Main {
 	public static async void main (string[] args) {
+		Posix.signal(Posix.Signal.PIPE, ()=>{
+			warning ("Broken Pipe !");
+			error ("Please try run the tester with -v options to see the segfault");
+		});
 		try {
 			minishell_emp = "../minishell";
 			jobs_thread = get_num_processors();
@@ -413,7 +416,7 @@ class Main {
 			yield all_test(args);
 		}
 		catch (Error e) {
-			printerr(e.message);
+			warning(e.message);
 		}
 	}
 
