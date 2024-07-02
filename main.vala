@@ -426,7 +426,7 @@ class Main {
 		{ "only-output", 'o', OptionFlags.NONE, OptionArg.NONE, ref print_only_output, "Display only error-output", null },
 		{ "only-status", 's', OptionFlags.NONE, OptionArg.NONE, ref print_only_status, "Display only error-status", null },
 		{ "minishell", 'm', OptionFlags.NONE, OptionArg.FILENAME, ref minishell_emp, "the path of minishell default: '../minishell'", "Minishell Path"},
-		{ "jobs", 'j', OptionFlags.NONE, OptionArg.INT, ref jobs_thread, "The number of thread jobs by default is number of cpu ($(get_num_processors()))", "num of hjobs"},
+		{ "jobs", 'j', OptionFlags.NONE, OptionArg.INT, ref jobs_thread, "The number of thread jobs by default is number of cpu", "num of jobs"},
 		{ "leak", 'v', OptionFlags.NONE, OptionArg.NONE, ref print_leak, "Add Leak test (is too slow)", null },
 		{ null }
 	};
