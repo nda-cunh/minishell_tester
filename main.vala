@@ -2,6 +2,7 @@ public bool print_only_error = false;
 public bool print_only_output = false;
 public bool print_only_status = false;
 public bool print_leak = false;
+public uint jobs_thread;
 public string minishell_emp;
 
 
@@ -121,9 +122,9 @@ async void all_test(string []args) {
 	add_test.begin(" ");
 	add_test.begin("				");
 	add_test.begin(" cat -e < Makefile < ../.gitignor  ");
-	add_test.begin(" < main.c ");
-	add_test.begin(" < main.c cat");
-	add_test.begin(" < main.c > /dev/stdout");
+	add_test.begin(" < file_not_found ");
+	add_test.begin(" < file_not_found cat");
+	add_test.begin(" < file_not_found > /dev/stdout");
 	add_test.begin(" pwd");
 	add_test.begin(" echo -n salut");
 	add_test.begin(" echo -nnnnnnnnnnnnnn1 salut");
@@ -383,6 +384,7 @@ class Main {
 	public static async void main (string[] args) {
 		try {
 			minishell_emp = "../minishell";
+			jobs_thread = get_num_processors();
 
 			// Enable UTF8 for the terminal
 			Intl.setlocale();
@@ -424,6 +426,7 @@ class Main {
 		{ "only-output", 'o', OptionFlags.NONE, OptionArg.NONE, ref print_only_output, "Display only error-output", null },
 		{ "only-status", 's', OptionFlags.NONE, OptionArg.NONE, ref print_only_status, "Display only error-status", null },
 		{ "minishell", 'm', OptionFlags.NONE, OptionArg.FILENAME, ref minishell_emp, "the path of minishell default: '../minishell'", "Minishell Path"},
+		{ "jobs", 'j', OptionFlags.NONE, OptionArg.INT, ref jobs_thread, "The number of thread jobs by default is number of cpu ($(get_num_processors()))", "num of hjobs"},
 		{ "leak", 'v', OptionFlags.NONE, OptionArg.NONE, ref print_leak, "Add Leak test (is too slow)", null },
 		{ null }
 	};

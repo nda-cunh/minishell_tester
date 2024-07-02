@@ -22,7 +22,7 @@ async void add_test(string command, string []?av = null) {
 
 	++Nb_max_test;
 	++Max_async_test;
-	while (Max_process >= get_num_processors ()) {
+	while (Max_process >= jobs_thread) {
 		Idle.add(add_test.callback);
 		yield;
 	}
@@ -48,7 +48,7 @@ async ShellInfo run_minishell (string cmd, string []?av) throws Error {
 	if (print_leak)
 		process = new Subprocess.newv ({"valgrind", "--leak-check=full", minishell_emp}, STDIN_PIPE | STDERR_PIPE | STDOUT_PIPE);
 	else
-		process = new Subprocess.newv ({minishell_emp}, STDIN_PIPE | STDOUT_PIPE);
+		process = new Subprocess.newv ({minishell_emp, "--no-clear"}, STDIN_PIPE | STDOUT_PIPE | SubprocessFlags.STDERR_SILENCE);
 
 	var uid = Timeout.add (4000, ()=> {
 		timeout.cancel();
@@ -122,7 +122,6 @@ static bool is_okay (ShellInfo minishell, ShellInfo bash) {
 		int index = 0;
 
 		do {
-			Thread.usleep (100000);
 			index = tmp.index_of("definitely lost: ", 4);
 			if (index != -1) {
 				int m;
@@ -153,23 +152,26 @@ async int test (string command, string []?av = null) throws Error {
 		var minishell = yield run_minishell (command, av);
 
 		var thread = new Thread<void>(null, ()=> {
-			unowned string output;
-			if (command.strip() == "") {
-				output = minishell.output.offset(minishell.output.index_of("SupraVala: exit") + 15);
-				minishell_output = output[0: output.last_index_of("SupraVala: exit")];
-			}
-			else {
-				output = minishell.output;
-				unowned string end;
-				while (true) {
-					output = output.offset(output.index_of("SupraVala: ") + 11);
-					output = output.offset(output.index_of_char ('\n') + 1);
-					minishell_output += output[0: output.index_of("SupraVala: ")];
-					end = output.offset(output.index_of("SupraVala: "));
-					if (end.index_of("SupraVala: ", 1) == -1) {
-						break;
-					}
+			unowned string output = minishell.output;
+
+			int index;
+			while (true) {
+				index = output.index_of("SupraVala: ");
+				if (index == -1) {
+					minishell_output += output;
+					break;
 				}
+
+				output = output.offset(index + 11);
+				output = output.offset(output.index_of_char ('\n') + 1);
+
+				index = output.index_of("SupraVala: ");
+				if (index == -1) {
+					minishell_output += output;
+					break;
+				}
+				else
+					minishell_output += output[0: index];
 			}
 			Idle.add(test.callback);
 		});
