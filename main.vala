@@ -1,6 +1,6 @@
 public bool print_only_error = false;
-public bool print_only_output = false;
-public bool print_only_status = false;
+public bool print_output = false;
+public bool print_status = false;
 public bool print_leak = false;
 public uint jobs_thread;
 public string minishell_emp;
@@ -190,7 +190,7 @@ async void all_test(string []args) {
 	/////////////////////////////
 
 
-	add_test.begin("""env | sort | grep -v SHLVL | grep -v ^_""");
+	add_test.begin("""env | sort | grep -v SHLVL | grep -v LD_PRELOAD | grep -v ^_""");
 	add_test.begin("""cat ./test_files/infile_big | grep oi""");
 	add_test.begin("""at minishell.h | grep ");"$""");
 	add_test.begin("""export GHOST=123 | env | grep GHOST""");
@@ -414,6 +414,10 @@ class Main {
 				warning ("The minishell is not an executable !");
 				return ;
 			}
+
+			print_status = !print_status;
+			print_output = !print_output;
+
 			yield all_test(args);
 		}
 		catch (Error e) {
@@ -423,8 +427,8 @@ class Main {
 
 	const GLib.OptionEntry[] options = {
 		{ "only-error", 'e', OptionFlags.NONE, OptionArg.NONE, ref print_only_error, "Display Error and do not print [OK] test", null },
-		{ "only-output", 'o', OptionFlags.NONE, OptionArg.NONE, ref print_only_output, "Display only error-output", null },
-		{ "only-status", 's', OptionFlags.NONE, OptionArg.NONE, ref print_only_status, "Display only error-status", null },
+		{ "no-output", 'o', OptionFlags.NONE, OptionArg.NONE, ref print_output, "Don't Display error-output", null },
+		{ "no-status", 's', OptionFlags.NONE, OptionArg.NONE, ref print_status, "Don't Display error-status", null },
 		{ "minishell", 'm', OptionFlags.NONE, OptionArg.FILENAME, ref minishell_emp, "the path of minishell default: '../minishell'", "Minishell Path"},
 		{ "jobs", 'j', OptionFlags.NONE, OptionArg.INT, ref jobs_thread, "The number of thread jobs by default is number of cpu", "num of jobs"},
 		{ "leak", 'v', OptionFlags.NONE, OptionArg.NONE, ref print_leak, "Add Leak test (is too slow)", null },

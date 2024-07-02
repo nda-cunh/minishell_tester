@@ -113,7 +113,10 @@ async ShellInfo run_bash (string cmd, string []?av) {
 
 static bool is_okay (ShellInfo minishell, ShellInfo bash) {
 	bool ret = true;
-	if (minishell.output != bash.output || minishell.status != bash.status) {
+	if (print_output && minishell.output != bash.output) {
+		ret = false;
+	}
+	if (print_status && minishell.status != bash.status) {
 		ret = false;
 	}
 	if (print_leak) {
@@ -207,12 +210,12 @@ async int test (string command, string []?av = null) throws Error {
 				}
 			}
 			print ("\033[31;1m[KO]\033[0m\n");
-			if (minishell.status != bash.status) {
+			if (print_status && minishell.status != bash.status) {
 				printerr("\033[91mStatus mismatch:\033[0m\n");
 				printerr("  Minishell: [%d]\n", minishell.status);
 				printerr("  Bash: [%d]\n\n", bash.status);
 			}
-			if (minishell.output != bash.output) {
+			if (print_output && minishell.output != bash.output) {
 				printerr("\033[91mOutput mismatch:\033[0m\n");
 				printerr("  Minishell: [%s]\n", minishell.output);
 				printerr("  Bash: [%s]\n\n", bash.output);
