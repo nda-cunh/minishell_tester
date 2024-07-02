@@ -145,38 +145,35 @@ static bool is_okay (ShellInfo minishell, ShellInfo bash) {
  */
 async int test (string command, string []?av = null) throws Error {
 	try {
-		string minishell_output = "";
 		//////////////////////////
 		// Run Minishell
 		//////////////////////////
 		var minishell = yield run_minishell (command, av);
 
-		var thread = new Thread<void>(null, ()=> {
-			unowned string output = minishell.output;
+		//////////////////////////
+		// Parse the output
+		//////////////////////////
+		
+		unowned string output = minishell.output;
+		string minishell_output = "";
+		int index;
 
-			int index;
-			while (true) {
-				index = output.index_of("SupraVala: ");
-				if (index == -1) {
-					minishell_output += output;
-					break;
-				}
+		index = output.index_of("SupraVala: ");
+		// If the output doesn't contain "SupraVala: " we just return the output
+		if (index == -1)
+			minishell_output += output;
+		// Get all output between the Prompt and the next Prompt
+		while (index != -1) {
+			output = output.offset(index + 11);
+			output = output.offset(output.index_of_char ('\n') + 1);
 
-				output = output.offset(index + 11);
-				output = output.offset(output.index_of_char ('\n') + 1);
-
-				index = output.index_of("SupraVala: ");
-				if (index == -1) {
-					minishell_output += output;
-					break;
-				}
-				else
-					minishell_output += output[0: index];
+			index = output.index_of("SupraVala: ");
+			if (index == -1) {
+				minishell_output += output;
 			}
-			Idle.add(test.callback);
-		});
-		yield;
-		thread.join ();
+			else
+				minishell_output += output[0: index];
+		}
 
 		minishell.output = (owned)minishell_output;
 
