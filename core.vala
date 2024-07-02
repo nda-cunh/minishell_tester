@@ -83,29 +83,24 @@ async ShellInfo run_minishell (string cmd, string []?av) throws Error {
 /**
  * Run Bash with a command and return the output and the status
  */
-async ShellInfo run_bash (string cmd, string []?av) {
+async ShellInfo run_bash (string cmd, string []?av) throws Error {
 	ShellInfo result = {};
 
-	string command = cmd;
-
+	var arguments = new StringBuilder(cmd);
+	arguments.append_c ('\n');
 	if (av != null) {
 		foreach (unowned var arg in av) {
-			command += "; " + arg;
+			arguments.append(arg);
+			arguments.append_c ('\n');
 		}
 	}
 
-	var thread = new Thread<void>(null, ()=> {
-		try {
-			Process.spawn_sync (null, {"bash", "-c", command}, null, SEARCH_PATH, null, out result.output, out result.errput, out result.status);
-		}
-		catch (Error e) {
-			warning(e.message);
-		}
-		Idle.add(run_bash.callback);
-	});
+	var process = new Subprocess.newv ({"bash"}, STDIN_PIPE | STDERR_PIPE | STDOUT_PIPE);
 
-	yield;
-	thread.join ();
+	yield process.communicate_utf8_async (arguments.str, null, out result.output, out result.errput);
+	yield process.wait_async ();
+
+	result.status = process.get_exit_status ();
 
 	return result;
 }
@@ -186,8 +181,6 @@ async int test (string command, string []?av = null) throws Error {
 		//////////////////////////
 
 		var bash = yield run_bash (command, av);
-		bash.status = bash.status >> 8;
-
 
 		//////////////////////////
 		// Print the result
