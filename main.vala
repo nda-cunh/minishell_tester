@@ -4,7 +4,7 @@ public bool print_status = false;
 public bool print_leak = false;
 public uint jobs_thread;
 public string minishell_emp;
-
+unowned string PWD;
 
 async void all_test(string []args) {
 	////////////////////////////////////////////////////////////////////////////
@@ -28,48 +28,6 @@ async void all_test(string []args) {
 	add_test.begin({"""echo hi | > >>"""});
 	add_test.begin({"""echo hi | < |"""});
 	add_test.begin({"""echo hi |   | """});
-
-	///////////////////////
-	// Test With Exit
-	///////////////////////
-
-	add_test.begin({"""exit 123"""});
-	add_test.begin({"""exit 298"""});
-	add_test.begin({"""exit +100"""});
-	add_test.begin({"""exit "+100""""});
-	add_test.begin({"""exit +"100""""});
-	add_test.begin({"""exit -100"""});
-	add_test.begin({"""exit "-100""""});
-	add_test.begin({"""exit -"100""""});
-	add_test.begin({"""exit hello"""});
-	add_test.begin({"""exit 42 world"""});
-
-
-	///////////////////////
-	// Test With Env
-	///////////////////////
-
-	add_test.begin({"""export hello"""});
-	add_test.begin({"""export HELLO=123"""});
-	add_test.begin({"""export A-"""});
-	add_test.begin({"""export HELLO=123 A"""});
-	add_test.begin({"""export HELLO="123 A-""""});
-	add_test.begin({"""export hello world"""});
-	add_test.begin({"""export HELLO-=123"""});
-	add_test.begin({"""export ="""});
-	add_test.begin({"""export 123"""});
-
-
-
-	add_test.begin({"""unset"""});
-	add_test.begin({"""unset HELLO"""});
-	add_test.begin({"""unset HELLO1 HELLO2"""});
-	add_test.begin({"""unset HOME"""});
-	add_test.begin({"""unset SHELL"""});
-	add_test.begin({"""unset PATH""", "/bin/ls"});
-	add_test.begin({"""unset PATH""", "ls"});
-	add_test.begin({"""export A='suprapack'""", "echo a $A", "unset A", "echo a $A"});
-
 
 	/////////////////////////////
 	// Test With Simple Command
@@ -121,7 +79,6 @@ async void all_test(string []args) {
 	add_test.begin({" < file_not_found "});
 	add_test.begin({" < file_not_found cat"});
 	add_test.begin({" < file_not_found > /dev/stdout"});
-	add_test.begin({" pwd"});
 	add_test.begin({" echo -n salut"});
 	add_test.begin({" echo -nnnnnnnnnnnnnn1 salut"});
 	add_test.begin({" echo -nnnnnnnnnnnnnn1 salut  nvobwriov wr gow v '$USER>eef>$USER' "});
@@ -185,11 +142,6 @@ async void all_test(string []args) {
 	// Test With Pipes
 	/////////////////////////////
 
-
-	// add_test.begin({"""env | sort | grep -v SHLVL | grep -v LD_PRELOAD | grep -v ^_"""});
-	add_test.begin({"""cat ./test_files/infile_big | grep oi"""});
-	add_test.begin({"""export GHOST=123 | env | grep GHOST"""});
-
 	add_test.begin({""" echo hello|cat -e"""});
 	add_test.begin({""" echo hello      |cat -e"""});
 	add_test.begin({""" echo hello|               cat -e"""});
@@ -226,10 +178,6 @@ async void all_test(string []args) {
 	add_test.begin({""" printf $??? $?? $? """});
 	add_test.begin({""" printf "$USER$USER'' = ' $L ANG '" '' """});
 	add_test.begin({""" printf "$USER$USER" """});
-	add_test.begin({""" env | grep USER | md5sum """});
-	add_test.begin({""" env | grep USER """});
-	add_test.begin({""" pwd """});
-	add_test.begin({""" pwd | grep /"""});
 	add_test.begin({""" echo $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ | wc -l"""});
 	add_test.begin({""" echo $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ | wc -l"""});
 	add_test.begin({""" echo $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ | wc -l"""});
@@ -297,13 +245,13 @@ async void all_test(string []args) {
 	///////////////////////////////////
 
 
-	add_test.begin({" echo 'Hello World' >trash/a.test ", "cat a.test -e"});
-	add_test.begin({" >trash/b.test echo 'Hello World' >trash/c.test ", "cat b.test -e", "echo A", "cat c.test -e"});
-	add_test.begin ({"echo 'A' >trash/l.test", "echo 'B' >trash/>trash/l.test", "echo 'C' >trash/>trash/l.test", "cat l.test -e"});
-	add_test.begin ({"echo 'A' >trash/m.test", " >trash/>trash/m.test echo 'B'", ">trash/>trash/m.test echo 'C'", "cat m.test -e"});
+	add_test.begin({" printf 'Hello World' >trash/a.test ", "cat a.test -e"});
+	add_test.begin({" >trash/b.test printf 'Hello World' >trash/c.test ", "cat b.test -e", "echo A", "cat c.test -e"});
+	add_test.begin ({"printf 'A' >trash/l.test", "echo 'B' >trash/>trash/l.test", "echo 'C' >trash/>trash/l.test", "cat l.test -e"});
+	add_test.begin ({"printf 'A' >trash/m.test", " >trash/>trash/m.test echo 'B'", ">trash/>trash/m.test echo 'C'", "cat m.test -e"});
 
-	add_test.begin ({"echo 'hello world' >/dev/null | cat -e"});
-	add_test.begin ({">/dev/null echo 'hello world' | cat -e"});
+	add_test.begin ({"printf 'hello world' >/dev/null | cat -e"});
+	add_test.begin ({">/dev/null printf 'hello world' | cat -e"});
 	add_test.begin ({" > /dev/stdout"});
 	add_test.begin ({" >> /dev/stdout"});
 	add_test.begin ({" < /dev/stdout"});
@@ -313,21 +261,88 @@ async void all_test(string []args) {
 	///////////////////////////////////
 
 
-	add_test.begin({"""$PWD"""});
-	add_test.begin({"""$EMPTY"""});
-	add_test.begin({"""$EMPTY echo hi"""});
-	add_test.begin({"""./test_files/invalid_permission"""});
-	add_test.begin({"""./missing.out"""});
-	add_test.begin({"""missing.out"""});
+	add_test.begin({"$PWD"});
+	add_test.begin({"$EMPTY"});
+	add_test.begin({"$EMPTY echo hi"});
+	add_test.begin({"./test_files/invalid_permission"});
+	add_test.begin({"./missing.out"});
+	add_test.begin({"missing.out"});
 	add_test.begin({""""aaa""""});
-	add_test.begin({"""test_files"""});
-	add_test.begin({"""./test_files"""});
-	add_test.begin({"""/test_files"""});
-	add_test.begin({"""minishell.h"""});
-	add_test.begin({"""$"""});
-	add_test.begin({"""$?"""});
-	add_test.begin({"""README.md"""});
+	add_test.begin({"""'aaa'"""});
+	add_test.begin({"test_files"});
+	add_test.begin({"./test_files"});
+	add_test.begin({"/test_files"});
+	add_test.begin({"minishell.h"});
+	add_test.begin({"$"});
+	add_test.begin({"$?"});
+	add_test.begin({"README.md"});
 	add_test.begin({"edsfdsf" , "echo error: $?"});
+	
+	///////////////////////////////////
+	// Test PWD
+	///////////////////////////////////
+
+	add_test.begin({"pwd"});
+	add_test.begin({"pwd .."});
+	add_test.begin({"pwd ."});
+	add_test.begin({"pwd . | cat -e"});
+	add_test.begin({"pwd | cat -e"});
+	add_test.begin({"printf a | pwd | cat -e"});
+	
+	///////////////////////////////////
+	// Test ENV 
+	///////////////////////////////////
+
+	add_test.begin({"unset LD_PRELOAD", "unset PWD", "unset LANG", "unset OLDPWD", "unset ARGS", "unset MAKEFLAGS", "unset MFLAGS", "env | grep -v _ | grep -v SHLVL | grep -v SHELL | sort"});
+	add_test.begin({"""export GHOST=123 | env | grep GHOST"""});
+	add_test.begin({""" env | grep USER | md5sum """});
+	add_test.begin({""" env | grep USER """});
+
+	///////////////////////
+	// Test With Export 
+	///////////////////////
+
+	add_test.begin({"unset LD_PRELOAD", "unset PWD", "unset LANG", "unset OLDPWD", "unset ARGS", "unset MAKEFLAGS", "unset MFLAGS", "export | grep -v _ | grep -v SHLVL | grep -v SHELL"});
+	add_test.begin({"""export hello"""});
+	add_test.begin({"""export HELLO=123""", "printf : $HELLO"});
+	add_test.begin({"""export A-"""});
+	add_test.begin({"""export HELLO=123 A"""});
+	add_test.begin({"""export HELLO="123 A-""""});
+	add_test.begin({"""export hello world"""});
+	add_test.begin({"""export HELLO-=123"""});
+	add_test.begin({"""export ="""});
+	add_test.begin({"""export 123"""});
+	add_test.begin({"""export SLS='/bin/ls'""", "printf here:", "$SLS"});
+
+
+	add_test.begin({"unset"});
+	add_test.begin({"unset HELLO1 HELLO2"});
+	add_test.begin({"unset HOME", "echo $HOME"});
+	add_test.begin({"unset PATH", "/bin/ls"});
+	add_test.begin({"unset PATH", "ls"});
+	add_test.begin({"unset PATH", @"export PATH=$PWD", "ls"});
+	add_test.begin({"unset PATH", @"export PATH=$PWD", "/bin/ls"});
+	add_test.begin({"unset PATH", @"export PATH=$PWD", @"$PWD/ls"});
+	add_test.begin({"export A='suprapack'", "echo a $A", "unset A", "echo a $A"});
+	add_test.begin({"export HELLO=abc", "unset HELLO"});
+	add_test.begin({"export HELLO=abc", "unset HELL", "unset HELLOO", "printf : $HELLO"});
+
+	///////////////////////
+	// Test With Exit
+	///////////////////////
+
+	add_test.begin({"""exit 123"""});
+	add_test.begin({"""exit 298"""});
+	add_test.begin({"""exit +100"""});
+	add_test.begin({"""exit "+100""""});
+	add_test.begin({"""exit +"100""""});
+	add_test.begin({"""exit -100"""});
+	add_test.begin({"""exit "-100""""});
+	add_test.begin({"""exit -"100""""});
+	add_test.begin({"""exit hello"""});
+	add_test.begin({"""exit 42 world"""});
+
+
 
 
 	// run the loading animation
@@ -373,6 +388,7 @@ async void loading() {
 [Compact]
 class Main {
 	public static async void main (string[] args) {
+		PWD = Environment.get_variable("PWD");
 		Posix.signal(Posix.Signal.PIPE, ()=>{
 			warning ("Broken Pipe !");
 			error ("Please try run the tester with -v options to see the segfault");
@@ -420,7 +436,7 @@ class Main {
 		}
 	}
 
-	const GLib.OptionEntry[] options = {
+	const OptionEntry[] options = {
 		{ "only-error", 'e', OptionFlags.NONE, OptionArg.NONE, ref print_only_error, "Display Error and do not print [OK] test", null },
 		{ "no-output", 'o', OptionFlags.NONE, OptionArg.NONE, ref print_output, "Don't Display error-output", null },
 		{ "no-status", 's', OptionFlags.NONE, OptionArg.NONE, ref print_status, "Don't Display error-status", null },
