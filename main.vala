@@ -6,38 +6,39 @@ public uint jobs_thread;
 public string minishell_emp;
 unowned string PWD;
 
+////////////////////////////////////////////////////////////////////////////
+// All test is here !
+////////////////////////////////////////////////////////////////////////////
 async void all_test(string []args) {
-	////////////////////////////////////////////////////////////////////////////
-	// All test is here !
-	////////////////////////////////////////////////////////////////////////////
 
 	// [NOTE]: triple quote is used to avoid escape character
 
-	add_test.begin({"""|"""});
-	add_test.begin({"""| echo oi"""});
-	add_test.begin({"""| |"""});
-	add_test.begin({"""| $"""});
-	add_test.begin({""">"""});
-	add_test.begin({""">>"""});
-	add_test.begin({""">>>"""});
-	add_test.begin({"""<"""});
-	add_test.begin({"""<<"""});
-	add_test.begin({"""echo hi <"""});
-	add_test.begin({"""cat    <| ls"""});
-	add_test.begin({"""echo hi | >"""});
-	add_test.begin({"""echo hi | > >>"""});
-	add_test.begin({"""echo hi | < |"""});
-	add_test.begin({"""echo hi |   | """});
+	add_test.begin({"|"});
+	add_test.begin({"| echo oi"});
+	add_test.begin({"| |"});
+	add_test.begin({"| | |"});
+	add_test.begin({"| $"});
+	add_test.begin({">"});
+	add_test.begin({">>"});
+	add_test.begin({">>>"});
+	add_test.begin({"<"});
+	add_test.begin({"<<"});
+	add_test.begin({"echo hi <"});
+	add_test.begin({"cat    <| ls"});
+	add_test.begin({"echo hi | >"});
+	add_test.begin({"echo hi | > >>"});
+	add_test.begin({"echo hi | < |"});
+	add_test.begin({"echo hi |   | "});
 
 	/////////////////////////////
 	// Test With Simple Command
 	/////////////////////////////
 
-	add_test.begin({""" /bin/ls """});
-	add_test.begin({""" /bin/ls -la """});
-	add_test.begin({""" /bin/ls -l """});
-	add_test.begin({""" /bin/ls -l -a """});
-	add_test.begin({""" /bin/ls -l -a -t """});
+	add_test.begin({" /bin/ls "});
+	add_test.begin({" /bin/ls -la "});
+	add_test.begin({" /bin/ls -l "});
+	add_test.begin({" /bin/ls -l -a "});
+	add_test.begin({" /bin/ls -l -a -t "});
 
 	add_test.begin({""" printf "Hello World" """});
 	add_test.begin({""" printf 'Hello World' """});
@@ -320,9 +321,9 @@ async void all_test(string []args) {
 	add_test.begin({"unset HOME", "echo $HOME"});
 	add_test.begin({"unset PATH", "/bin/ls"});
 	add_test.begin({"unset PATH", "ls"});
-	add_test.begin({"unset PATH", @"export PATH=$PWD", "ls"});
-	add_test.begin({"unset PATH", @"export PATH=$PWD", "/bin/ls"});
-	add_test.begin({"unset PATH", @"export PATH=$PWD", @"$PWD/ls"});
+	add_test.begin({"unset PATH", @"export PATH='$PWD'", "ls"});
+	add_test.begin({"unset PATH", @"export PATH='$PWD'", "/bin/ls"});
+	add_test.begin({"unset PATH", @"export PATH='$PWD'", @"$PWD/ls"});
 	add_test.begin({"export A='suprapack'", "echo a $A", "unset A", "echo a $A"});
 	add_test.begin({"export HELLO=abc", "unset HELLO"});
 	add_test.begin({"export HELLO=abc", "unset HELL", "unset HELLOO", "printf : $HELLO"});

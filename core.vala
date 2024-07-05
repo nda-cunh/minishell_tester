@@ -47,9 +47,9 @@ async ShellInfo run_minishell (string []?av) throws Error {
 
 	// Run minishell with valgrind or no
 	if (print_leak)
-		process = new Subprocess.newv ({"valgrind", "--leak-check=full", minishell_emp}, STDIN_PIPE | STDERR_PIPE | STDOUT_PIPE);
+		process = new Subprocess.newv ({"valgrind", "--leak-check=full", "--show-leak-kinds=all", minishell_emp}, STDIN_PIPE | STDERR_PIPE | STDOUT_PIPE);
 	else
-		process = new Subprocess.newv ({minishell_emp, "--no-clear"}, STDIN_PIPE | STDOUT_PIPE | SubprocessFlags.STDERR_SILENCE);
+		process = new Subprocess.newv ({minishell_emp}, STDIN_PIPE | STDOUT_PIPE | SubprocessFlags.STDERR_SILENCE);
 
 	// Add a timeout of 4 seconds
 	var uid = Timeout.add (4000, ()=> {
@@ -104,10 +104,12 @@ async ShellInfo run_bash (string []av) throws Error {
 }
 
 
+delegate void test_me(string str_test);
 /**
  * Check if the output, the status and the memory leak are okay
  */
-static bool is_okay (ShellInfo minishell, ShellInfo bash) {
+static bool is_okay (ShellInfo minishell, ShellInfo bash, out string? valgrind) {
+	valgrind = null;
 	bool ret = true;
 	if (print_output && minishell.output != bash.output) {
 		ret = false;
@@ -115,23 +117,53 @@ static bool is_okay (ShellInfo minishell, ShellInfo bash) {
 	if (print_status && minishell.status != bash.status) {
 		ret = false;
 	}
+	var errbuilder = new StringBuilder ();
 	if (print_leak) {
-		int malloc = 0;
 		unowned string tmp = minishell.errput;
 		int index = 0;
 
-		do {
-			index = tmp.index_of("definitely lost: ", 4);
-			if (index != -1) {
-				int m;
-				tmp = tmp.offset(index);
-				tmp.scanf ("definitely lost: %d bytes", out m); 
-				malloc += m;
-			}
-		} while (index != -1);
+		// Check if there is a memory leak
+		
+		test_me func = ((s) => {
+			tmp = minishell.errput;
+			do {
+				int p1;
+				int p2;
+				index = tmp.index_of(s, 4);
+				if (index != -1) {
+					tmp = tmp.offset(index);
+					tmp = tmp.offset(tmp.index_of_char (':') + 1);
+					tmp.scanf (" %d bytes in %d blocks", out p1, out p2);
+					if (p1 != 0 || p2 != 0) {
+						errbuilder.append(s);
+						errbuilder.append(tmp[0: tmp.index_of_char ('\n') + 1]);
+					}
+				}
+			} while (index != -1);
+		});
+		func ("definitely lost:");
+		func ("possibly lost:");
+		func ("indirectly lost:");
+		// func ("still reachable:");
 
-		if (malloc != 0) {
-			printerr("\033[91mMemory leak: %d bytes\033[0m\n", malloc);
+		func = ((s) => {
+			tmp = minishell.errput;
+			do {
+				index = tmp.index_of(s, 4);
+				if (index != -1) {
+					tmp = tmp.offset(index);
+					errbuilder.append(tmp[0: tmp.index_of_char ('\n') + 1]);
+				}
+			} while (index != -1);
+		});
+
+		func("Conditional jump or move depends on uninitialised value");
+		func("Invalid read of size");
+		func("Invalid write of size");
+		func("Use of uninitialised value of size");
+
+		if (errbuilder.str != "") {
+			valgrind = (owned)errbuilder.str;
 			ret = false;
 		}
 	}
@@ -196,7 +228,9 @@ async int test (string []?av = null) throws Error {
 		if (print_only_error == false) {
 			print_test(av);
 		}
-		if (is_okay (minishell, bash)) {
+
+		string? valgrind;
+		if (is_okay (minishell, bash, out valgrind)) {
 			if (print_only_error == false)
 				print ("\033[32;1m[OK]\033[0m");
 		}
@@ -214,6 +248,10 @@ async int test (string []?av = null) throws Error {
 				printerr("\033[91mOutput mismatch:\033[0m\n");
 				printerr("  Minishell: [%s]\n", minishell.output);
 				printerr("  Bash: [%s]\n\n", bash.output);
+			}
+			if (valgrind != null) {
+				printerr("\033[91mMemory leak:\033[0m\n");
+				printerr("  %s\n", valgrind.replace ("\n", "\n  "));
 			}
 			return 0;
 		}
