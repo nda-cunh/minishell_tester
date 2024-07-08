@@ -1,3 +1,5 @@
+Please do not use it for correction
+
 # Dependencies
 - valac and a C compiler (gcc/clang/...)
 
