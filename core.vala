@@ -174,7 +174,7 @@ static bool is_okay (ShellInfo minishell, ShellInfo bash, out string? valgrind) 
 static void print_test(string []av) {
 	print ("\033[36;1mTest\033[0m");
 	foreach (unowned var arg in av) {
-		print (" [%s]", arg);
+		print (" [%s]", arg.escape ("\'\""));
 	}
 }
 /**
