@@ -12,6 +12,8 @@ unowned string PWD;
 async void all_test(string []args) {
 
 	// [NOTE]: triple quote is used to avoid escape character
+	
+
 
 	add_test.begin({"|"});
 	add_test.begin({"| echo oi"});
@@ -29,6 +31,10 @@ async void all_test(string []args) {
 	add_test.begin({"echo hi | > >>"});
 	add_test.begin({"echo hi | < |"});
 	add_test.begin({"echo hi |   | "});
+	add_test.begin({"expr $? + $?", "expr $? + $?", "expr $? + $?"});
+	add_test.begin({"$"});
+	add_test.begin({". | . | ."});
+
 
 	/////////////////////////////
 	// Test With Simple Command
@@ -283,6 +289,9 @@ async void all_test(string []args) {
 	// Test PWD
 	///////////////////////////////////
 
+	add_test.begin({"clear | pwd"});
+	add_test.begin({"clear | pwd | cat -e"});
+	add_test.begin({"clear | pwd . | cat -e"});
 	add_test.begin({"pwd"});
 	add_test.begin({"pwd .."});
 	add_test.begin({"pwd ."});
@@ -295,14 +304,21 @@ async void all_test(string []args) {
 	///////////////////////////////////
 
 	add_test.begin({"unset LD_PRELOAD", "unset PWD", "unset LANG", "unset OLDPWD", "unset ARGS", "unset MAKEFLAGS", "unset MFLAGS", "env | grep -v _ | grep -v SHLVL | grep -v SHELL | sort"});
-	add_test.begin({"""export GHOST=123 | env | grep GHOST"""});
 	add_test.begin({""" env | grep USER | md5sum """});
 	add_test.begin({""" env | grep USER """});
+	
+	add_test.begin({"unset 6_a"});
+	add_test.begin({"unset -ndacunh"});
+	add_test.begin({"unset 0oui"});
+	add_test.begin({"unset PWD HERE", "echo $PWD"});
+
 
 	///////////////////////
 	// Test With Export 
 	///////////////////////
 
+	add_test.begin({"export NDACUNH=42", "unset NDACUNH | printf hey", "printf : $NDACUNH"});
+	add_test.begin({"""export GHOST=123 | env | grep GHOST"""});
 	add_test.begin({"unset LD_PRELOAD", "unset PWD", "unset LANG", "unset OLDPWD", "unset ARGS", "unset MAKEFLAGS", "unset MFLAGS", "export | grep -v _ | grep -v SHLVL | grep -v SHELL"});
 	add_test.begin({"""export hello"""});
 	add_test.begin({"""export HELLO=123""", "printf : $HELLO"});
@@ -314,6 +330,8 @@ async void all_test(string []args) {
 	add_test.begin({"""export ="""});
 	add_test.begin({"""export 123"""});
 	add_test.begin({"""export SLS='/bin/ls'""", "printf here:", "$SLS"});
+	add_test.begin({"export UNO=1 DOS-2 TRES=3 || env | grep TRES"});
+	add_test.begin({"unset HELLO="});
 
 
 	add_test.begin({"unset"});
@@ -334,6 +352,7 @@ async void all_test(string []args) {
 
 	add_test.begin({"""exit 123"""});
 	add_test.begin({"""exit 298"""});
+	add_test.begin({"""exit 256"""});
 	add_test.begin({"""exit +100"""});
 	add_test.begin({"""exit "+100""""});
 	add_test.begin({"""exit +"100""""});
@@ -342,7 +361,25 @@ async void all_test(string []args) {
 	add_test.begin({"""exit -"100""""});
 	add_test.begin({"""exit hello"""});
 	add_test.begin({"""exit 42 world"""});
+	add_test.begin({"exit 9223372036854775807"});
+	add_test.begin({"exit 9223372036854775808"});
+	add_test.begin({"exit -9223372036854775807"});
+	add_test.begin({"exit -9223372036854775808"});
+	add_test.begin({"exit -9223372036854775809"});
 
+	
+	///////////////////////
+	// Test With HereDoc 
+	///////////////////////
+
+	add_test.begin({"<< end cat -e \nsimple\ntest\nend"});
+	add_test.begin({"<< AH cat -e \nsimple\ntest\nend\nAH"});
+	add_test.begin({"<< AH cat -e \nsimple\n\n\n\n\n\n\nend\nAH"});
+	add_test.begin({"<< AH cat -e | grep -o 'simple' \nsimple\nend\nAH"});
+	add_test.begin({"<< \"EOF\" cat -e \n$USER\nEOF"});
+	add_test.begin({"<< \'EOF\' cat -e \n$USER\nEOF"});
+	add_test.begin({"<< \"EOF\" cat -e \nnda-cunh\nEOF"});
+	add_test.begin({"<< \'EOF\' cat -e \nnda-cunh\nEOF"});
 
 
 
