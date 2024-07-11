@@ -6,7 +6,7 @@ SRC_FAKE = fake_readline.vala
 all: $(NAME) fake_readline.so
 
 $(NAME_FAKE): $(SRC_FAKE) 
-	valac $(SRC_FAKE) -X -O2 --pkg=gmodule-2.0 --library=readline -X --shared -o $(NAME_FAKE) -X -fpic -X -w
+	valac $(SRC_FAKE) -X -O2 --profile=posix dlopen.vapi --library=readline -X --shared -o $(NAME_FAKE) -X -fpic -X -w
 
 $(NAME): ${SRC} 
 	valac ${SRC} --pkg=posix --pkg=gio-2.0 -X -w -X -O3 -o $(NAME) 
