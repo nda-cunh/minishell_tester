@@ -459,6 +459,7 @@ class Main {
 			}
 
 			// Check if the minishell is an executable
+			FileUtils.chmod(minishell_emp, 0755);
 			if (FileUtils.test (minishell_emp, FileTest.IS_EXECUTABLE) == false) {
 				warning ("The minishell is not an executable !");
 				return ;
