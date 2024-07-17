@@ -1,3 +1,3 @@
 #!/bin/bash
 
-printf OOOOOOOH is not a ls
+printf 'OOOOOOOH im not a ls'
