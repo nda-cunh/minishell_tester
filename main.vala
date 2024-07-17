@@ -78,6 +78,7 @@ async void all_test(string []args) {
 	add_test.begin({"""echo $"""});
 	add_test.begin({"""echo $?"""});
 	add_test.begin({"""echo $?HELLO"""});
+	add_test.begin({""" printf  $"  $USER  a"  """});
 
 
 	add_test.begin({" "});
