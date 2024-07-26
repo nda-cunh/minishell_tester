@@ -451,7 +451,10 @@ class Main {
 			log_hander();
 
 			// Enable Fake Readline it write a fake prompt 'SupraVala: '
-			Environment.set_variable("LD_PRELOAD", Environment.get_current_dir () + "/fake_readline.so", true);
+			if (" " in PWD)
+				Environment.set_variable("LD_PRELOAD", "./fake_readline.so", true);
+			else
+				Environment.set_variable("LD_PRELOAD", @"$PWD/fake_readline.so", true);
 
 			// Create the trash directory
 			DirUtils.create ("trash", 0777);
