@@ -1,5 +1,7 @@
 Please do not use it for correction
 
+	Vous n'êtes pas obligé d'avoir 100/100 c'est à vous de jugez si un teste est obligatoire ou non.
+
 # Dependencies
 - valac and a C compiler (gcc/clang/...)
 
@@ -11,13 +13,24 @@ Please do not use it for correction
 ./tester
 ```
 
-if you want , you can just print error :)
+if you want , you can just print error :)  (run --help for more information)
 
 ```bash
 ./tester --only-error
+./tester -e
 ```
+# Memory Test 
 
-```
+'-v' (--leak) is very slow, it's a leak test it can test:
+- uninitialized value
+- conditional jump or move depends on uninitialised value 
+- invalid read of size
+- invalid write of size
+- use after free
+- lost memory
+
+
+```bash
 Usage:
   tester [OPTION…] - Minishell Tester -
 
