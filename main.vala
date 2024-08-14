@@ -31,9 +31,16 @@ async void all_test(string []args) {
 	add_test.begin({"echo hi | > >>"});
 	add_test.begin({"echo hi | < |"});
 	add_test.begin({"echo hi |   | "});
+	add_test.begin({"echo $EMPYT"});
+	add_test.begin({"echo $EMPYT    abc"});
+	add_test.begin({"echo $EMPYT abc"});
+	add_test.begin({"echo $EMPYT abc   $EMPTY"});
+	add_test.begin({"echo $EMPYT abc $EMPTY"});
+	add_test.begin({"$EMPTY echo $EMPYT abc"});
 	add_test.begin({"expr $? + $?", "expr $? + $?", "expr $? + $?"});
 	add_test.begin({"$"});
 	add_test.begin({". | . | ."});
+	add_test.begin({"./no_permission"});
 
 
 	/////////////////////////////
@@ -82,7 +89,8 @@ async void all_test(string []args) {
 
 
 	add_test.begin({" "});
-	add_test.begin({"				"});
+	add_test.begin({"			"});
+	add_test.begin({""""""""});
 	add_test.begin({" cat -e < Makefile < ../.gitignor  "});
 	add_test.begin({" < file_not_found "});
 	add_test.begin({" < file_not_found cat"});
@@ -318,6 +326,7 @@ async void all_test(string []args) {
 	// Test With Export and unset 
 	///////////////////////
 
+	add_test.begin({"export ABC", "export | grep ABC -o", "printf hi", "env | grep ABC"});
 	add_test.begin({"export NDACUNH=42", "unset NDACUNH | printf hey", "printf : $NDACUNH"});
 	add_test.begin({"""export GHOST=123 | env | grep GHOST"""});
 	add_test.begin({"unset LD_PRELOAD", "unset PWD", "unset LANG", "unset OLDPWD", "unset ARGS", "unset MAKEFLAGS", "unset MFLAGS", "export | grep -v _ | grep -v SHLVL | grep -v SHELL"});
@@ -389,7 +398,6 @@ async void all_test(string []args) {
 	add_test.begin({"<< \'EOF\' cat -e \n$USER\nEOF"});
 	add_test.begin({"<< \"EOF\" cat -e \nnda-cunh\nEOF"});
 	add_test.begin({"<< \'EOF\' cat -e \nnda-cunh\nEOF"});
-
 
 
 
