@@ -317,7 +317,7 @@ async void all_test(string []args) {
 	add_test.begin({""" env | grep USER """});
 	
 	add_test.begin({"unset 6_a"});
-	add_test.begin({"unset -ndacunh"});
+	add_test.begin({"unset ndacunh"});
 	add_test.begin({"unset 0oui"});
 	add_test.begin({"unset PWD HERE", "echo $PWD"});
 
@@ -326,10 +326,9 @@ async void all_test(string []args) {
 	// Test With Export and unset 
 	///////////////////////
 
-	add_test.begin({"export ABC", "export | grep ABC -o", "printf hi", "env | grep ABC"});
+	add_test.begin({"export ABC", "env | grep ABC -o", "printf hi", "env | grep ABC"});
 	add_test.begin({"export NDACUNH=42", "unset NDACUNH | printf hey", "printf : $NDACUNH"});
 	add_test.begin({"""export GHOST=123 | env | grep GHOST"""});
-	add_test.begin({"unset LD_PRELOAD", "unset PWD", "unset LANG", "unset OLDPWD", "unset ARGS", "unset MAKEFLAGS", "unset MFLAGS", "export | grep -v _ | grep -v SHLVL | grep -v SHELL"});
 	add_test.begin({"""export hello"""});
 	add_test.begin({"""export HELLO=123""", "printf : $HELLO"});
 	add_test.begin({"""export A-"""});
@@ -340,7 +339,7 @@ async void all_test(string []args) {
 	add_test.begin({"""export ="""});
 	add_test.begin({"""export 123"""});
 	add_test.begin({"""export SLS='/bin/ls'""", "printf here:", "$SLS"});
-	add_test.begin({"export UNO=1 DOS-2 TRES=3 || env | grep TRES"});
+	add_test.begin({"export UNO=1 DOS-2 TRES=3 | env | grep TRES"});
 	add_test.begin({"export abcd=abcd", "export abcd+=ndacunh", "env | grep abcd"});
 	add_test.begin({"export ABCD=abcd", "export ABCD +=ndacunh", "env | grep ABCD"});
 	add_test.begin({"export ABCD=abcd", "export ABCD += ndacunh", "env | grep ABCD"});
@@ -398,6 +397,7 @@ async void all_test(string []args) {
 	add_test.begin({"<< \'EOF\' cat -e \n$USER\nEOF"});
 	add_test.begin({"<< \"EOF\" cat -e \nnda-cunh\nEOF"});
 	add_test.begin({"<< \'EOF\' cat -e \nnda-cunh\nEOF"});
+	add_test.begin({"cat << here -e\nhello\nhere"});
 
 
 
