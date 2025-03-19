@@ -261,13 +261,17 @@ async void all_test(string []args) {
 	///////////////////////////////////
 
 
-	add_test.begin({" printf 'Hello World' >trash/a.test ", "cat a.test -e"});
-	add_test.begin({" >trash/b.test printf 'Hello World' >trash/c.test ", "cat b.test -e", "echo A", "cat c.test -e"});
-	add_test.begin ({"printf 'A' >trash/l.test", "echo 'B' >trash/>trash/l.test", "echo 'C' >trash/>trash/l.test", "cat l.test -e"});
-	add_test.begin ({"printf 'A' >trash/m.test", " >trash/>trash/m.test echo 'B'", ">trash/>trash/m.test echo 'C'", "cat m.test -e"});
+	add_test.begin({" printf 'Hello World' >trash/$WHOAMI.a.test ", "cat trash/$WHOAMI.a.test -e"});
+	add_test.begin({" >trash/$WHOAMI.b.test printf 'Hello World' >trash/$WHOAMI.c.test ", "cat trash/$WHOAMI.b.test -e", "echo A", "cat trash/$WHOAMI.c.test -e"});
+	add_test.begin ({"printf 'A' >trash/$WHOAMI.l.test", "echo 'B' >trash/>>trash/$WHOAMI.l.test", "echo 'C' >trash/>trash/$WHOAMI.l.test", "cat trash/$WHOAMI.l.test -e", "cat trash/>trash/$WHOAMI.l.test -e"});
+	add_test.begin ({"printf 'A' >trash/$WHOAMI.m.test", " >trash/>trash/$WHOAMI.m.test echo 'B'", ">trash/>trash/$WHOAMI.m.test echo 'C'", "cat $WHOAMI.m.test -e"});
 
 	add_test.begin ({"printf 'hello world' >/dev/null | cat -e"});
+	add_test.begin ({"printf 'hello ' >trash/$WHOAMI.test", "printf 'world' >>trash/$WHOAMI.test", "cat trash/$WHOAMI.test -e"});
+	add_test.begin ({"printf 'hello ' >trash/$WHOAMI.test2", "printf 'world' >>trash/$WHOAMI.test2", "printf ' ndacunh' >>trash/$WHOAMI.test2", "cat trash/$WHOAMI.test2 -e"});
+
 	add_test.begin ({">/dev/null printf 'hello world' | cat -e"});
+	add_test.begin ({">/dev/stdout printf 'hello world' | cat -e"});
 	add_test.begin ({" > /dev/stdout"});
 	add_test.begin ({" >> /dev/stdout"});
 	add_test.begin ({" < /dev/stdout"});
@@ -312,7 +316,7 @@ async void all_test(string []args) {
 	// Test ENV 
 	///////////////////////////////////
 
-	add_test.begin({"unset LD_PRELOAD", "unset PWD", "unset LANG", "unset OLDPWD", "unset ARGS", "unset MAKEFLAGS", "unset MFLAGS", "env | grep -v _ | grep -v SHLVL | grep -v SHELL | sort"});
+	add_test.begin({"unset LD_PRELOAD", "unset WHOAMI", "unset PWD", "unset LANG", "unset OLDPWD", "unset ARGS", "unset MAKEFLAGS", "unset MFLAGS", "env | grep -v _ | grep -v SHLVL | grep -v SHELL | sort"});
 	add_test.begin({""" env | grep USER | md5sum """});
 	add_test.begin({""" env | grep USER """});
 	

@@ -45,6 +45,7 @@ async ShellInfo run_minishell (string []?av) throws Error {
 	ShellInfo result = {};
 	Subprocess process;
 
+	Environment.set_variable ("WHOAMI", "mini", true);
 	// Run minishell with valgrind or no
 	if (print_leak)
 		process = new Subprocess.newv ({"valgrind", "--leak-check=full", "--show-leak-kinds=all", minishell_emp}, STDIN_PIPE | STDERR_PIPE | STDOUT_PIPE);
@@ -89,6 +90,7 @@ async ShellInfo run_bash (string []av) throws Error {
 	// Concat all av in one string
 	var command = string.joinv("\n", av);
 
+	Environment.set_variable ("WHOAMI", "bash", true);
 	// Run bash
 	var process = new Subprocess(STDIN_PIPE | STDERR_PIPE | STDOUT_PIPE, "bash");
 	

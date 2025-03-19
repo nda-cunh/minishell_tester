@@ -20,6 +20,6 @@ clean:
 	rm -rf ${NAME} ${NAME_FAKE} trash
 
 run: all
-	./tester
+	./tester $(ARGS)
 
 .PHONY: all re clean run debug
