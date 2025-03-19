@@ -19,6 +19,13 @@ if you want , you can just print error :)  (run --help for more information)
 ./tester --only-error
 ./tester -e
 ```
+
+for bonus use '-b' or '--bonus'
+
+```bash
+./tester --bonus
+./tester -b
+```
 # Memory Test 
 
 '-v' (--leak) is very slow, it's a leak test it can test:

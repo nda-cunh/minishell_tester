@@ -2,6 +2,7 @@ public bool print_only_error = false;
 public bool print_output = false;
 public bool print_status = false;
 public bool print_leak = false;
+public bool print_bonus = false;
 public uint jobs_thread;
 public string minishell_emp;
 unowned string PWD;
@@ -404,6 +405,98 @@ async void all_test(string []args) {
 	add_test.begin({"cat << here -e\nhello\nhere"});
 
 
+	if (print_bonus == true) {
+		add_test.begin({"cat << here -e\nhello\nhere"});
+		add_test.begin({"*"});
+		add_test.begin({"*/*"});
+		add_test.begin({"*/*"});
+		add_test.begin({"echo *"});
+		add_test.begin({"echo D*"});
+		add_test.begin({"echo *Z"});
+		add_test.begin({"echo *t hola"});
+		add_test.begin({"echo *t"});
+		add_test.begin({"echo $*"});
+		add_test.begin({"echo hola*hola *"});
+		add_test.begin({"echo $hola*"});
+		add_test.begin({"echo $HOME*"});
+		add_test.begin({"cd *"});
+		add_test.begin({"cd *"});
+		add_test.begin({"cd *"});
+		add_test.begin({"echo hola || cat"});
+		add_test.begin({ "🍒  ||"});
+		add_test.begin({"pwd || ls"});
+		add_test.begin({"echo hola || echo bonjour"});
+		add_test.begin({"echo hola && echo bonjour"});
+		add_test.begin({"echo bonjour || echo hola"});
+		add_test.begin({"echo bonjour && echo hola"});
+		add_test.begin({"echo -n bonjour && echo -n hola"});
+		add_test.begin({"pwd && ls && echo hola"});
+		add_test.begin({"pwd || ls && echo hola"});
+		add_test.begin({"pwd && ls || echo hola"});
+		add_test.begin({"pwd || ls || echo hola"});
+
+
+add_test.begin({"""ls || export """""});  
+add_test.begin({"""export "" || ls"""});
+add_test.begin({"""ls && export """""});
+add_test.begin({"""export "" && ls"""});
+add_test.begin({"""export "" && unset """""});
+
+add_test.begin({"ls || ;"});
+add_test.begin({"; || ls"});
+add_test.begin({"ls && ;"});
+add_test.begin({"; && ls"});
+add_test.begin({"ls || <"});
+add_test.begin({"ls && <"});
+add_test.begin({"cat | echo || ls"});
+add_test.begin({"cat | echo && ls"});
+add_test.begin({"ls || cat | echo"});
+add_test.begin({"ls && cat | echo"});
+add_test.begin({"(ls)"});
+add_test.begin({"( ( ls ) )"});
+add_test.begin({"( ( ) ls )"});
+add_test.begin({"ls && (ls)"});
+add_test.begin({"(ls && pwd)"});
+add_test.begin({"( ( ls&&pwd ) )"});
+add_test.begin({"( ( ls ) &&pwd )"});
+add_test.begin({"(ls && ( ( pwd ) ) )"});
+add_test.begin({"(ls && pwd) > hola $> cat hola"});
+add_test.begin({"> hola ls && pwd"});
+add_test.begin({"> hola (ls && pwd)"});
+add_test.begin({"(> pwd) $> ls"});
+add_test.begin({"(< pwd) $> ls"});
+add_test.begin({"(< pwd)"});
+add_test.begin({"( ( ( ( ( pwd) ) ) ) )"});
+add_test.begin({"() pwd"});
+add_test.begin({"> pwd (ls)"});
+add_test.begin({"(ls||pwd)&&(ls||pwd)"});
+add_test.begin({"(lss||pwd)&&(lss||pwd)"});
+add_test.begin({"(lss&&pwd)&&(lss&&pwd)"});
+add_test.begin({"(ls && pwd | wc) > hola $> cat hola"});
+add_test.begin({"(ls && pwd | wc) > hola $> (ls && pwd | wc) > hola $> cat hola"});
+add_test.begin({"(ls && pwd | wc) >> hola $> echo hey&&(ls && pwd | wc) > hola $> cat hola"});
+add_test.begin({"(pwd | wc) < hola"});
+add_test.begin({"(ls && pwd | wc) < hola"});
+add_test.begin({"(ls -z || pwd | wc) < hola"});
+add_test.begin({"echo hey > hola $> (pwd | wc) < hola"});
+add_test.begin({"echo hey > hola $> (ls && pwd | wc) < hola"});
+add_test.begin({"echo hey > hola $> (ls -z || pwd | wc) < hola"});
+add_test.begin({"(ls -z || pwd && ls)"});
+add_test.begin({"ls || (cat Makefile|grep srcs) && (pwd|wc)"});
+add_test.begin({"ls -z && (ls) && (pwd)"});
+add_test.begin({"(ls > Docs/hey && pwd) > hola $> cat hola $> cat Docs/hey"});
+add_test.begin({"ls > Docs/hey && pwd > hola $> cat hola $> cat Docs/hey"});
+add_test.begin({"cd ../.. && pwd && pwd"});
+add_test.begin({"(cd ../.. && pwd) && pwd"});
+add_test.begin({"ls -z || cd ../../..&&pwd $> pwd"});
+add_test.begin({"ls -z || (cd ../../..&&pwd) $> pwd"});
+add_test.begin({"ls *"});
+add_test.begin({"ls *.*"});
+add_test.begin({"ls *.hola"});
+add_test.begin({"cat M*le"});
+add_test.begin({"cat M*ee"});
+add_test.begin({"cat Make*file"});
+	}
 
 
 	// run the loading animation
@@ -508,6 +601,7 @@ class Main {
 		{ "minishell", 'm', OptionFlags.NONE, OptionArg.FILENAME, ref minishell_emp, "the path of minishell default: '../minishell'", "Minishell Path"},
 		{ "jobs", 'j', OptionFlags.NONE, OptionArg.INT, ref jobs_thread, "The number of thread jobs by default is number of cpu", "num of jobs"},
 		{ "leak", 'v', OptionFlags.NONE, OptionArg.NONE, ref print_leak, "Add Leak test (is too slow)", null },
+		{"bonus", 'b', OptionFlags.NONE, OptionArg.NONE, ref print_bonus, "Add Bonus test", null},
 		{ null }
 	};
 }
