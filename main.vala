@@ -41,7 +41,7 @@ async void all_test(string []args) {
 	add_test.begin({"$EMPTY echo $EMPYT abc"});
 	add_test.begin({"expr $? + $?", "expr $? + $?", "expr $? + $?"});
 	add_test.begin({"$"});
-	add_test.begin({". | . | ."});
+	add_test.begin({".. | .. | .."});
 	add_test.begin({"./no_permission"});
 
 
