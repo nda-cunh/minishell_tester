@@ -2,6 +2,7 @@ public bool print_only_error = false;
 public bool print_output = false;
 public bool print_status = false;
 public bool print_leak = false;
+public bool print_trace_children = false;
 public bool print_bonus = false;
 public uint jobs_thread;
 public string minishell_emp;
@@ -570,6 +571,9 @@ class Main {
 			opt_context.add_main_entries (options, null);
 			opt_context.parse (ref args);
 
+			if (print_trace_children)
+				print_leak = true;
+
 			// Check if the minishell is compiled
 			if (FileUtils.test (minishell_emp, FileTest.EXISTS) == false) {
 				warning ("Please compile the minishell before running the test !");
@@ -601,6 +605,7 @@ class Main {
 		{ "minishell", 'm', OptionFlags.NONE, OptionArg.FILENAME, ref minishell_emp, "the path of minishell default: '../minishell'", "Minishell Path"},
 		{ "jobs", 'j', OptionFlags.NONE, OptionArg.INT, ref jobs_thread, "The number of thread jobs by default is number of cpu", "num of jobs"},
 		{ "leak", 'v', OptionFlags.NONE, OptionArg.NONE, ref print_leak, "Add Leak test (is too slow)", null },
+		{ "trace-children", '\0', OptionFlags.NONE, OptionArg.NONE, ref print_trace_children, "enable the leak mode and trace children in fork", null },
 		{"bonus", 'b', OptionFlags.NONE, OptionArg.NONE, ref print_bonus, "Add Bonus test", null},
 		{ null }
 	};

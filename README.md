@@ -35,6 +35,7 @@ for bonus use '-b' or '--bonus'
 - invalid write of size
 - use after free
 - lost memory
+'--trace-children' is used to trace children in fork
 
 
 ```bash
@@ -51,5 +52,6 @@ Application Options:
   -m, --minishell=Minishell Path     the path of minishell default: '../minishell'
   -j, --jobs=num of jobs             The number of thread jobs by default is number of cpu
   -v, --leak                         Add Leak test (is too slow)
-
+  --trace-children                   enable the leak mode and trace children in fork
+  -b, --bonus                        Add Bonus test
 ```

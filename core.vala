@@ -48,7 +48,12 @@ async ShellInfo run_minishell (string []?av) throws Error {
 	Environment.set_variable ("WHOAMI", "mini", true);
 	// Run minishell with valgrind or no
 	if (print_leak)
-		process = new Subprocess.newv ({"valgrind", "--leak-check=full", "--show-leak-kinds=all", minishell_emp}, STDIN_PIPE | STDERR_PIPE | STDOUT_PIPE);
+	{
+		if (print_trace_children)
+			process = new Subprocess.newv ({"valgrind", "--trace-children=yes", "--leak-check=full", "--show-leak-kinds=all", minishell_emp}, STDIN_PIPE | STDERR_PIPE | STDOUT_PIPE);
+		else
+			process = new Subprocess.newv ({"valgrind", "--leak-check=full", "--show-leak-kinds=all", minishell_emp}, STDIN_PIPE | STDERR_PIPE | STDOUT_PIPE);
+	}
 	else
 		process = new Subprocess.newv ({minishell_emp}, STDIN_PIPE | STDOUT_PIPE | SubprocessFlags.STDERR_SILENCE);
 
