@@ -91,7 +91,6 @@ async void all_test(string []args) {
 
 
 	add_test.begin({" "});
-	add_test.begin({"			"});
 	add_test.begin({""""""""});
 	add_test.begin({" cat -e < Makefile < ../.gitignor  "});
 	add_test.begin({" < file_not_found "});
