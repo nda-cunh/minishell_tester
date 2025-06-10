@@ -37,6 +37,7 @@ async void add_test(string []?av = null) {
 	--Max_process;
 }
 
+private string []? valgrind_args_emp = null;
 /**
  * Run Minishell with a command and return the output and the status
  */
@@ -49,17 +50,19 @@ async ShellInfo run_minishell (string []?av) throws Error {
 	// Run minishell with valgrind or no
 	if (print_leak)
 	{
-		var valgrind_args = new StrvBuilder ();
-		valgrind_args.add ("valgrind");
-		valgrind_args.add ("--leak-check=full");
-		valgrind_args.add ("--show-leak-kinds=all");
-		if (print_trace_children)
-			valgrind_args.add ("--trace-children=yes");
-		if (print_track_fds)
-			valgrind_args.add ("--track-fds=yes");
-		valgrind_args.add (minishell_emp);
-		var end = valgrind_args.end ();
-		process = new Subprocess.newv (end, STDIN_PIPE | STDERR_PIPE | STDOUT_PIPE);
+		if (valgrind_args_emp == null) {
+			var valgrind_args = new StrvBuilder ();
+			valgrind_args.add ("valgrind");
+			valgrind_args.add ("--leak-check=full");
+			valgrind_args.add ("--show-leak-kinds=all");
+			if (print_trace_children)
+				valgrind_args.add ("--trace-children=yes");
+			if (print_track_fds)
+				valgrind_args.add ("--track-fds=yes");
+			valgrind_args.add (minishell_emp);
+			valgrind_args_emp = valgrind_args.end ();
+		}
+		process = new Subprocess.newv (valgrind_args_emp, STDIN_PIPE | STDERR_PIPE | STDOUT_PIPE);
 	}
 	else
 		process = new Subprocess.newv ({minishell_emp}, STDIN_PIPE | STDOUT_PIPE | SubprocessFlags.STDERR_SILENCE);
