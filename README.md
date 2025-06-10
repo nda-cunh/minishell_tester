@@ -52,6 +52,7 @@ Application Options:
   -m, --minishell=Minishell Path     the path of minishell default: '../minishell'
   -j, --jobs=num of jobs             The number of thread jobs by default is number of cpu
   -v, --leak                         Add Leak test (is too slow)
-  --trace-children                   enable the leak mode and trace children in fork
+  -c, --trace-children               enable the leak mode and trace children in fork
+  -f, --track-fds                    enable the leak mode and track file descriptors
   -b, --bonus                        Add Bonus test
 ```

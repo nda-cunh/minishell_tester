@@ -49,10 +49,17 @@ async ShellInfo run_minishell (string []?av) throws Error {
 	// Run minishell with valgrind or no
 	if (print_leak)
 	{
+		var valgrind_args = new StrvBuilder ();
+		valgrind_args.add ("valgrind");
+		valgrind_args.add ("--leak-check=full");
+		valgrind_args.add ("--show-leak-kinds=all");
 		if (print_trace_children)
-			process = new Subprocess.newv ({"valgrind", "--trace-children=yes", "--leak-check=full", "--show-leak-kinds=all", minishell_emp}, STDIN_PIPE | STDERR_PIPE | STDOUT_PIPE);
-		else
-			process = new Subprocess.newv ({"valgrind", "--leak-check=full", "--show-leak-kinds=all", minishell_emp}, STDIN_PIPE | STDERR_PIPE | STDOUT_PIPE);
+			valgrind_args.add ("--trace-children=yes");
+		if (print_track_fds)
+			valgrind_args.add ("--track-fds=yes");
+		valgrind_args.add (minishell_emp);
+		var end = valgrind_args.end ();
+		process = new Subprocess.newv (end, STDIN_PIPE | STDERR_PIPE | STDOUT_PIPE);
 	}
 	else
 		process = new Subprocess.newv ({minishell_emp}, STDIN_PIPE | STDOUT_PIPE | SubprocessFlags.STDERR_SILENCE);
@@ -168,6 +175,8 @@ static bool is_okay (ShellInfo minishell, ShellInfo bash, out string? valgrind) 
 		func("Invalid read of size");
 		func("Invalid write of size");
 		func("Use of uninitialised value of size");
+		func("Open file descriptor");
+
 
 		if (errbuilder.str != "") {
 			valgrind = (owned)errbuilder.str;
