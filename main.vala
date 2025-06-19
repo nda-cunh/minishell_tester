@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.vala                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: nda-cunh <marvin@d42.fr>                   +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/06/19 23:46:12 by nda-cunh          #+#    #+#             */
+/*   Updated: 2025/06/19 23:46:12 by nda-cunh         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 public bool print_only_error = false;
 public bool print_output = false;
 public bool print_status = false;
@@ -172,8 +184,13 @@ async void all_test(string []args) {
 	add_test.begin({""" ls | ls |ls | ls| ls |ls| ls|ls | ls | ls | ls | ls"""});
 	add_test.begin({""" cat Makefile | md5sum """});
 	add_test.begin({""" cat Makefile | grep -o SRC | tr '\n' ' ' """});
+
 	add_test.begin({""" cat /dev/urandom | head -c 15 | wc -c """});
 	add_test.begin({""" cat /dev/urandom | strings | grep -o "[A-Z][0-9]" | tr -d '\n' | head -c 15 | wc -c """});
+	add_test.begin({""" </dev/urandomcat | head -c 15 | wc -c """});
+	add_test.begin({""" </dev/urandomcat | strings | grep -o "[A-Z][0-9]" | tr -d '\n' | head -c 15 | wc -c """});
+	add_test.begin({""" cat </dev/urandom | head -c 15 | wc -c """});
+	add_test.begin({""" cat </dev/urandom | strings | grep -o "[A-Z][0-9]" | tr -d '\n' | head -c 15 | wc -c """});
 
 	/////////////////////////////
 	// Test With Variable
@@ -395,6 +412,7 @@ async void all_test(string []args) {
 	// Test With HereDoc 
 	///////////////////////
 
+	// Ctrl+D
 	add_test.begin({"<< end cat -e \nsimple\ntest\nend"});
 	add_test.begin({"<< AH cat -e \nsimple\ntest\nend\nAH"});
 	add_test.begin({"<< AH cat -e \nsimple\n\n\n\n\n\n\nend\nAH"});
@@ -404,6 +422,17 @@ async void all_test(string []args) {
 	add_test.begin({"<< \"EOF\" cat -e \nnda-cunh\nEOF"});
 	add_test.begin({"<< \'EOF\' cat -e \nnda-cunh\nEOF"});
 	add_test.begin({"cat << here -e\nhello\nhere"});
+
+	// With '\n'
+	add_test.begin({"<< end cat -e \nsimple\ntest\nend\n"});
+	add_test.begin({"<< AH cat -e \nsimple\ntest\nend\nAH\n"});
+	add_test.begin({"<< AH cat -e \nsimple\n\n\n\n\n\n\nend\nAH\n"});
+	add_test.begin({"<< AH cat -e | grep -o 'simple' \nsimple\nend\nAH\n"});
+	add_test.begin({"<< \"EOF\" cat -e \n$USER\nEOF\n"});
+	add_test.begin({"<< \'EOF\' cat -e \n$USER\nEOF\n"});
+	add_test.begin({"<< \"EOF\" cat -e \nnda-cunh\nEOF\n"});
+	add_test.begin({"<< \'EOF\' cat -e \nnda-cunh\nEOF\n"});
+	add_test.begin({"cat << here -e\nhello\nhere\n"});
 
 
 	if (print_bonus == true) {
