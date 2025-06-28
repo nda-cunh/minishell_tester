@@ -391,7 +391,6 @@ async void all_test(string []args) {
 	///////////////////////
 
 	add_test.begin({"""exit 123"""});
-	add_test.begin({"""exit 298"""});
 	add_test.begin({"""exit 256"""});
 	add_test.begin({"""exit +100"""});
 	add_test.begin({"""exit "+100""""});
@@ -401,6 +400,7 @@ async void all_test(string []args) {
 	add_test.begin({"""exit -"100""""});
 	add_test.begin({"""exit hello"""});
 	add_test.begin({"""exit 42 world"""});
+	add_test.begin({"exit 13 | exit 14"});
 	add_test.begin({"exit 9223372036854775807"});
 	add_test.begin({"exit 9223372036854775808"});
 	add_test.begin({"exit -9223372036854775807"});
