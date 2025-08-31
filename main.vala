@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   main.vala                                          :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: nda-cunh <marvin@d42.fr>                   +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/19 23:46:12 by nda-cunh          #+#    #+#             */
-/*   Updated: 2025/06/19 23:46:12 by nda-cunh         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 public bool print_only_error = false;
 public bool print_output = false;
 public bool print_status = false;
@@ -19,6 +7,7 @@ public bool print_track_fds = false;
 public bool print_bonus = false;
 public uint jobs_thread;
 public string minishell_emp;
+public string? log_file = null;
 unowned string PWD;
 
 ////////////////////////////////////////////////////////////////////////////
@@ -566,6 +555,18 @@ async void loading() {
 	}
 }
 
+FileStream output_log = null;
+unowned FileStream getOutputLog() {
+	if (output_log == null) {
+		output_log = FileStream.open(log_file, "w");
+		if (output_log == null) {
+			warning("Cannot open the log file");
+			return stdout;
+		}
+	}
+	return output_log;
+}
+
 ////////////////////////////////////////////////////////////////////////////
 // Main  -- options part and start the test
 ////////////////////////////////////////////////////////////////////////////
@@ -620,6 +621,19 @@ class Main {
 			print_status = !print_status;
 			print_output = !print_output;
 
+			if (log_file != null)
+			{
+				set_print_handler((text) => {
+					unowned var fs = getOutputLog();
+					fs.printf(text);
+				});
+				set_printerr_handler((text) => {
+					unowned var fs = getOutputLog();
+					fs.printf(text);
+				});
+				
+			}
+
 			yield all_test(args);
 		}
 		catch (Error e) {
@@ -637,6 +651,7 @@ class Main {
 		{ "trace-children", 'c', OptionFlags.NONE, OptionArg.NONE, ref print_trace_children, "enable the leak mode and trace children in fork", null },
 		{ "track-fds", 'f', OptionFlags.NONE, OptionArg.NONE, ref print_track_fds, "enable the leak mode and track file descriptors", null },
 		{"bonus", '\0', OptionFlags.NONE, OptionArg.NONE, ref print_bonus, "Add Bonus test", null},
+		{"log", '\0', OptionFlags.NONE, OptionArg.STRING, ref log_file, "Redirect all output to the log file'", null},
 		{ null }
 	};
 }
